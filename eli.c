@@ -65,9 +65,9 @@ Buffer * readfile(const char *fname)
     FILE *fp = fopen(fname, "r");
     if (fp) {
         buf = buf_new();
-        char fl[BUFSIZ];
-        while (fgets(fl, BUFSIZ, fp) != NULL) {
-            Line *l = line_new(fl, strlen(fl) - 1);
+        char in[BUFSIZ];
+        while (fgets(in, BUFSIZ, fp) != NULL) {
+            Line *l = line_new(in, strlen(in) - 1);
             buf_pushback(buf, l);
         }
         fclose(fp);
