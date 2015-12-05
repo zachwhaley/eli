@@ -7,6 +7,7 @@
 #include <string.h>
 
 typedef struct {
+    const char *name;
     Buffer *buf;
     Line *pos;
     size_t row, col;

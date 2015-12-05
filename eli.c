@@ -18,7 +18,6 @@ typedef struct {
 Window titlewin = {};
 Window textwin = {};
 
-const char *filename = NULL;
 File file = {};
 
 void init(int ac, const char *av[]);
@@ -43,8 +42,8 @@ void init(int ac, const char *av[])
     keypad(textwin.win, true);
 
     if (ac > 1) {
-        filename = av[1];
-        file.buf = readfile(filename);
+        file.name = av[1];
+        file.buf = readfile(file.name);
     }
     if (!file.buf) {
         file.buf = buf_new();
@@ -90,7 +89,8 @@ void display()
 {
     // Refresh title window
     char title[titlewin.cols];
-    snprintf(title, sizeof(title), " %s %lu,%lu", (filename) ? filename : "#No File#", file.row, file.col);
+    snprintf(title, sizeof(title), " %s %lu,%lu",
+             (file.name) ? file.name : "#No File#", file.row, file.col);
     wclear(titlewin.win);
     mvwaddstr(titlewin.win, 0, 0, title);
     for (size_t col = strlen(title); col < titlewin.cols; col++) {
@@ -143,7 +143,7 @@ void edit()
             case CTRL('q'):
                 return;
             case CTRL('w'):
-                writefile(filename);
+                writefile(file.name);
                 break;
             case KEY_HOME:
                 begofline(&file, ch);
