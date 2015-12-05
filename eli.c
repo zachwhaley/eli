@@ -24,6 +24,7 @@ void init(int ac, const char *av[]);
 void term();
 Buffer * readfile(const char *fname);
 void writefile(const char *fname);
+char * getinput(const char *msg, char *input);
 void display();
 void edit();
 
@@ -85,6 +86,27 @@ void writefile(const char *fname)
     }
 }
 
+char * getinput(const char *msg, char *input)
+{
+    // Title message
+    wclear(titlewin.win);
+    mvwaddstr(titlewin.win, 0, 0, msg);
+
+    // User input area
+    wattroff(titlewin.win, A_REVERSE);
+    waddch(titlewin.win, ' ');
+    wrefresh(titlewin.win);
+
+    // Get user input
+    echo();
+    wgetstr(titlewin.win, input);
+    noecho();
+
+    // Make the title window white again
+    wattron(titlewin.win, A_REVERSE);
+    return input;
+}
+
 void display()
 {
     // Refresh title window
@@ -143,6 +165,10 @@ void edit()
             case CTRL('q'):
                 return;
             case CTRL('w'):
+                if (!file.name) {
+                    char input[FILENAME_MAX];
+                    file.name = getinput("Save as:", input);
+                }
                 writefile(file.name);
                 break;
             case KEY_HOME:
