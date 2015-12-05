@@ -1,4 +1,4 @@
-CFLAGS = -g -Wall -std=c11
+CFLAGS = -g -Wall
 LDLIBS = -lncurses
 
 PRGM  = eli
