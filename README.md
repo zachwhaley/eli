@@ -32,3 +32,7 @@ Use <kbd>Ctrl-w</kbd> to save and <kbd>Ctrl-q</kbd> to quit.
 $ make
 $ ./eli somefile
 ```
+
+## Credit
+
+This project was influenced by the [sandy](http://tools.suckless.org/sandy) text editor
