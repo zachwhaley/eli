@@ -3,18 +3,6 @@
 
 #include <stdlib.h>
 
-Buffer * buf_new()
-{
-    Buffer *b = (Buffer *)calloc(1, sizeof(Buffer));
-    return b;
-}
-
-void buf_free(Buffer *buf)
-{
-    buf_clear(buf);
-    free(buf);
-}
-
 void buf_pushback(Buffer *buf, Line *line)
 {
     if (buf->end) {

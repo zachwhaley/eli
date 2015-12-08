@@ -8,7 +8,7 @@
 
 typedef struct {
     const char *name;
-    Buffer *buf;
+    Buffer buf;
     Line *pos;
     size_t row, col;
 } File;

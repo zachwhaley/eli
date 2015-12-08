@@ -61,10 +61,10 @@ void newline(File *file, int key)
     Line *l = line_new(split, len);
     memset(split, '\0', len);
     if (file->pos->next) {
-        buf_insert(file->buf, file->pos->next, l);
+        buf_insert(&file->buf, file->pos->next, l);
     }
     else {
-        buf_pushback(file->buf, l);
+        buf_pushback(&file->buf, l);
     }
     nextline(file, key);
     begofline(file, key);
@@ -78,7 +78,7 @@ void backchar(File *file, int key)
     // our current line
     if (file->pos == l->prev) {
         line_pushback(file->pos, l->str, strlen(l->str));
-        buf_erase(file->buf, l);
+        buf_erase(&file->buf, l);
     }
     else {
         line_erase(file->pos, file->col);

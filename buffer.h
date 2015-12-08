@@ -9,8 +9,6 @@ typedef struct {
     Line *beg, *end;
 } Buffer;
 
-Buffer * buf_new();
-void buf_free(Buffer *buf);
 void buf_pushfront(Buffer *buf, Line *line);
 void buf_pushback(Buffer *buf, Line *line);
 void buf_insert(Buffer *buf, Line *dst, Line *line);

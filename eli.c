@@ -22,7 +22,7 @@ File file = {};
 
 void init(int ac, const char *av[]);
 void term();
-Buffer * readfile(const char *fname);
+void readfile(const char *fname, Buffer *buf);
 void writefile(const char *fname);
 char * getinput(const char *msg, char *input);
 void display();
@@ -44,27 +44,24 @@ void init(int ac, const char *av[])
 
     if (ac > 1) {
         file.name = av[1];
-        file.buf = readfile(file.name);
+        readfile(file.name, &file.buf);
     }
-    if (!file.buf) {
-        file.buf = buf_new();
+    if (!file.buf.beg) {
         Line *l = line_new(NULL, 0);
-        buf_pushback(file.buf, l);
+        buf_pushback(&file.buf, l);
     }
-    file.pos = file.buf->beg;
+    file.pos = file.buf.beg;
 }
 
 void term()
 {
-    buf_free(file.buf);
+    buf_clear(&file.buf);
 }
 
-Buffer * readfile(const char *fname)
+void readfile(const char *fname, Buffer *buf)
 {
-    Buffer *buf = NULL;
     FILE *fp = fopen(fname, "r");
     if (fp) {
-        buf = buf_new();
         char in[BUFSIZ];
         while (fgets(in, BUFSIZ, fp) != NULL) {
             Line *l = line_new(in, strlen(in) - 1);
@@ -72,14 +69,13 @@ Buffer * readfile(const char *fname)
         }
         fclose(fp);
     }
-    return buf;
 }
 
 void writefile(const char *fname)
 {
     FILE *fp = fopen(fname, "w");
     if (fp) {
-        for (Line *l = file.buf->beg; l != NULL; l = l->next) {
+        for (Line *l = file.buf.beg; l != NULL; l = l->next) {
             fprintf(fp, "%s\n", l->str);
         }
         fclose(fp);
@@ -130,7 +126,7 @@ void display()
     }
     // Refresh text window
     size_t wline;
-    Line *fline = file.buf->beg;
+    Line *fline = file.buf.beg;
     for (wline = 0; wline < textwin.top && fline; wline++) {
         fline = fline->next;
     }
