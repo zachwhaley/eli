@@ -168,32 +168,32 @@ void edit()
                 writefile(file.name);
                 break;
             case KEY_HOME:
-                begofline(&file, ch);
+                file_begofline(&file, ch);
                 break;
             case KEY_END:
-                endofline(&file, ch);
+                file_endofline(&file, ch);
                 break;
             case KEY_UP:
-                prevline(&file, ch);
+                file_prevline(&file, ch);
                 break;
             case KEY_DOWN:
-                nextline(&file, ch);
+                file_nextline(&file, ch);
                 break;
             case KEY_RIGHT:
-                nextchar(&file, ch);
+                file_nextchar(&file, ch);
                 break;
             case KEY_LEFT:
-                prevchar(&file, ch);
+                file_prevchar(&file, ch);
                 break;
             case '\n':
             case '\r':
-                newline(&file, ch);
+                file_newline(&file, ch);
                 break;
             case KEY_BACKSPACE:
-                backchar(&file, ch);
+                file_backchar(&file, ch);
                 break;
             default:
-                addchar(&file, ch);
+                file_addchar(&file, ch);
         }
     }
 }

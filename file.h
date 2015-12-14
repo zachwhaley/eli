@@ -4,7 +4,7 @@
 #include "buffer.h"
 #include "line.h"
 
-#include <string.h>
+#include <stdlib.h>
 
 typedef struct {
     const char *name;
@@ -13,16 +13,18 @@ typedef struct {
     size_t row, col;
 } File;
 
-typedef void (*action)(File *, int);
 
-void begofline(File *file, int key);
-void endofline(File *file, int key);
-void nextchar(File *file, int key);
-void prevchar(File *file, int key);
-void nextline(File *file, int key);
-void prevline(File *file, int key);
-void newline(File *file, int key);
-void backchar(File *file, int key);
-void addchar(File *file, int key);
+// File actions
+typedef void (*action_func)(File *, int);
+
+void file_begofline(File *file, int key);
+void file_endofline(File *file, int key);
+void file_nextchar(File *file, int key);
+void file_prevchar(File *file, int key);
+void file_nextline(File *file, int key);
+void file_prevline(File *file, int key);
+void file_newline(File *file, int key);
+void file_backchar(File *file, int key);
+void file_addchar(File *file, int key);
 
 #endif /* __ELI_FILE_H__ */
