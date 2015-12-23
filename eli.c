@@ -10,15 +10,23 @@
 #define COUNT(x) (sizeof (x) / sizeof *(x))
 #define CTRL(chr) (chr & 037)
 
+typedef void (*action_func)(File *, int);
+
 typedef struct {
     WINDOW *win;
     size_t cols, lines;
     size_t top, bot;
 } Window;
 
+typedef enum {
+    NORMAL,
+    INSERT,
+} MODE;
+
 typedef struct {
     int key;
     action_func func;
+    MODE nextmode;
 } Action;
 
 typedef struct {
@@ -32,20 +40,38 @@ static void init(int ac, const char *av[]);
 static void term();
 static void writefile(File *, int);
 static char * getinput(const char *msg, char *input);
+static void setmode(MODE m);
 static void display();
 static void edit();
 
+Action normal_actions[] = {
+    { CTRL('w'), writefile,     NORMAL },
+    { 'i',       NULL,          INSERT },
+    { 'a',       file_nextchar, INSERT },
+    { 'h',       file_prevchar, NORMAL },
+    { 'j',       file_nextline, NORMAL },
+    { 'k',       file_prevline, NORMAL },
+    { 'l',       file_nextchar, NORMAL },
+};
+Mode normal_mode = {
+    .exit_key = CTRL('q'),
+    .default_action = NULL,
+    .actions = normal_actions,
+    .count = COUNT(normal_actions),
+};
+
 Action insert_actions[] = {
-    { CTRL('w'), writefile },
-    { KEY_HOME, file_begofline },
-    { KEY_END, file_endofline },
-    { KEY_UP, file_prevline },
-    { KEY_DOWN, file_nextline },
-    { KEY_RIGHT, file_nextchar },
-    { KEY_LEFT, file_prevchar },
-    { '\n', file_newline },
-    { '\r', file_newline },
-    { KEY_BACKSPACE, file_backchar },
+    { CTRL('w'),     writefile,      INSERT },
+    { KEY_HOME,      file_begofline, INSERT },
+    { KEY_END,       file_endofline, INSERT },
+    { KEY_UP,        file_prevline,  INSERT },
+    { KEY_DOWN,      file_nextline,  INSERT },
+    { KEY_RIGHT,     file_nextchar,  INSERT },
+    { KEY_LEFT,      file_prevchar,  INSERT },
+    { '\n',          file_newline,   INSERT },
+    { '\r',          file_newline,   INSERT },
+    { KEY_BACKSPACE, file_backchar,  INSERT },
+    { CTRL('i'),     NULL,           NORMAL },
 };
 Mode insert_mode = {
     .exit_key = CTRL('q'),
@@ -83,7 +109,7 @@ static void init(int ac, const char *av[])
     }
     file.pos = file.buf.beg;
 
-    mode = insert_mode;
+    setmode(NORMAL);
 }
 
 static void term()
@@ -120,6 +146,18 @@ static char * getinput(const char *msg, char *input)
     // Make the title window white again
     wattron(titlewin.win, A_REVERSE);
     return input;
+}
+
+static void setmode(MODE m)
+{
+    switch (m) {
+        case INSERT:
+            mode = insert_mode;
+            break;
+        case NORMAL:
+            mode = normal_mode;
+            break;
+    }
 }
 
 static void display()
@@ -179,19 +217,20 @@ static void edit()
         // Should we exit?
         if (key == mode.exit_key)
             return;
+
         // Find an action for the key
-        action_func action = NULL;
-        for (int i = 0; i < mode.count; i++) {
-            Action act = mode.actions[i];
-            if (act.key == key) {
-                action = act.func;
+        int ndx;
+        for (ndx = 0; ndx < mode.count; ndx++) {
+            Action action = mode.actions[ndx];
+            if (action.key == key) {
+                if (action.func)
+                    action.func(&file, key);
+                setmode(action.nextmode);
                 break;
             }
         }
-        // Do the action or resort to the default action
-        if (action)
-            action(&file, key);
-        else
+        // If no action found, resort to the default action
+        if (ndx == mode.count && mode.default_action)
             mode.default_action(&file, key);
     }
 }

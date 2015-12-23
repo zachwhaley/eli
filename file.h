@@ -17,8 +17,6 @@ void file_read(File *file);
 void file_write(File *file);
 
 // File actions
-typedef void (*action_func)(File *, int);
-
 void file_begofline(File *file, int key);
 void file_endofline(File *file, int key);
 void file_nextchar(File *file, int key);
