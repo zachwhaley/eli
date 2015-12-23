@@ -20,9 +20,11 @@ $ sudo dnf install gcc
 
 Displays a files content on the screen.
 
-Move around with the arrow keys.
+Move around with <kbd>h</kbd> <kbd>j</kbd> <kbd>k</kbd> and <kbd>l</kbd>.
 
-Type some things, and watch them appear.
+Enter insert mode with <kbd>i</kbd> and type some things.
+
+Exit insert mode with <kbd>Ctrl-i</kbd>
 
 Use <kbd>Ctrl-w</kbd> to save and <kbd>Ctrl-q</kbd> to quit.
 
