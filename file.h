@@ -13,6 +13,8 @@ typedef struct {
     size_t row, col;
 } File;
 
+void file_read(File *file);
+void file_write(File *file);
 
 // File actions
 typedef void (*action_func)(File *, int);

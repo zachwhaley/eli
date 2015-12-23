@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define COUNT(x) (sizeof (x) / sizeof *(x))
 #define CTRL(chr) (chr & 037)
 
 typedef struct {
@@ -15,20 +16,50 @@ typedef struct {
     size_t top, bot;
 } Window;
 
+typedef struct {
+    int key;
+    action_func func;
+} Action;
+
+typedef struct {
+    int exit_key;
+    action_func default_action;
+    Action *actions;
+    size_t count;
+} Mode;
+
+static void init(int ac, const char *av[]);
+static void term();
+static void writefile(File *, int);
+static char * getinput(const char *msg, char *input);
+static void display();
+static void edit();
+
+Action insert_actions[] = {
+    { CTRL('w'), writefile },
+    { KEY_HOME, file_begofline },
+    { KEY_END, file_endofline },
+    { KEY_UP, file_prevline },
+    { KEY_DOWN, file_nextline },
+    { KEY_RIGHT, file_nextchar },
+    { KEY_LEFT, file_prevchar },
+    { '\n', file_newline },
+    { '\r', file_newline },
+    { KEY_BACKSPACE, file_backchar },
+};
+Mode insert_mode = {
+    .exit_key = CTRL('q'),
+    .default_action = file_addchar,
+    .actions = insert_actions,
+    .count = COUNT(insert_actions),
+};
+
+Mode mode = {};
 Window titlewin = {};
 Window textwin = {};
-
 File file = {};
 
-void init(int ac, const char *av[]);
-void term();
-void readfile(const char *fname, Buffer *buf);
-void writefile(const char *fname);
-char * getinput(const char *msg, char *input);
-void display();
-void edit();
-
-void init(int ac, const char *av[])
+static void init(int ac, const char *av[])
 {
     const size_t cols = COLS, lines = LINES;
     titlewin.win = newwin(1, cols, lines - 1, 0);
@@ -44,45 +75,33 @@ void init(int ac, const char *av[])
 
     if (ac > 1) {
         file.name = av[1];
-        readfile(file.name, &file.buf);
+        file_read(&file);
     }
     if (!file.buf.beg) {
         Line *l = line_new(NULL, 0);
         buf_pushback(&file.buf, l);
     }
     file.pos = file.buf.beg;
+
+    mode = insert_mode;
 }
 
-void term()
+static void term()
 {
     buf_clear(&file.buf);
 }
 
-void readfile(const char *fname, Buffer *buf)
+// TODO: Need a better way to get user input for an action
+static void writefile(File *file, int key)
 {
-    FILE *fp = fopen(fname, "r");
-    if (fp) {
-        char in[BUFSIZ];
-        while (fgets(in, BUFSIZ, fp) != NULL) {
-            Line *l = line_new(in, strlen(in) - 1);
-            buf_pushback(buf, l);
-        }
-        fclose(fp);
+    if (!file->name) {
+        char input[FILENAME_MAX];
+        file->name = getinput("Save as:", input);
     }
+    file_write(file);
 }
 
-void writefile(const char *fname)
-{
-    FILE *fp = fopen(fname, "w");
-    if (fp) {
-        for (Line *l = file.buf.beg; l != NULL; l = l->next) {
-            fprintf(fp, "%s\n", l->str);
-        }
-        fclose(fp);
-    }
-}
-
-char * getinput(const char *msg, char *input)
+static char * getinput(const char *msg, char *input)
 {
     // Title message
     wclear(titlewin.win);
@@ -103,7 +122,7 @@ char * getinput(const char *msg, char *input)
     return input;
 }
 
-void display()
+static void display()
 {
     // Refresh title window
     char title[titlewin.cols];
@@ -151,50 +170,29 @@ void display()
     doupdate();
 }
 
-void edit()
+static void edit()
 {
     while (true) {
         display();
 
-        int ch = wgetch(textwin.win);
-        switch (ch) {
-            case CTRL('q'):
-                return;
-            case CTRL('w'):
-                if (!file.name) {
-                    char input[FILENAME_MAX];
-                    file.name = getinput("Save as:", input);
-                }
-                writefile(file.name);
+        int key = wgetch(textwin.win);
+        // Should we exit?
+        if (key == mode.exit_key)
+            return;
+        // Find an action for the key
+        action_func action = NULL;
+        for (int i = 0; i < mode.count; i++) {
+            Action act = mode.actions[i];
+            if (act.key == key) {
+                action = act.func;
                 break;
-            case KEY_HOME:
-                file_begofline(&file, ch);
-                break;
-            case KEY_END:
-                file_endofline(&file, ch);
-                break;
-            case KEY_UP:
-                file_prevline(&file, ch);
-                break;
-            case KEY_DOWN:
-                file_nextline(&file, ch);
-                break;
-            case KEY_RIGHT:
-                file_nextchar(&file, ch);
-                break;
-            case KEY_LEFT:
-                file_prevchar(&file, ch);
-                break;
-            case '\n':
-            case '\r':
-                file_newline(&file, ch);
-                break;
-            case KEY_BACKSPACE:
-                file_backchar(&file, ch);
-                break;
-            default:
-                file_addchar(&file, ch);
+            }
         }
+        // Do the action or resort to the default action
+        if (action)
+            action(&file, key);
+        else
+            mode.default_action(&file, key);
     }
 }
 

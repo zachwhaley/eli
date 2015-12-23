@@ -2,6 +2,9 @@
 
 #include <string.h>
 
+static void readfile(const char *fname, Buffer *buf);
+static void writefile(const char *fname, const Buffer *buf);
+
 void file_begofline(File *file, int key)
 {
     file->col = 0;
@@ -92,3 +95,39 @@ void file_addchar(File *file, int key)
     line_insert(file->pos, file->col, key);
     file_nextchar(file, key);
 }
+
+void file_read(File *file)
+{
+    readfile(file->name, &file->buf);
+}
+
+void file_write(File *file)
+{
+    writefile(file->name, &file->buf);
+}
+
+// Static Functions
+static void readfile(const char *fname, Buffer *buf)
+{
+    FILE *fp = fopen(fname, "r");
+    if (fp) {
+        char in[BUFSIZ];
+        while (fgets(in, BUFSIZ, fp) != NULL) {
+            Line *l = line_new(in, strlen(in) - 1);
+            buf_pushback(buf, l);
+        }
+        fclose(fp);
+    }
+}
+
+static void writefile(const char *fname, const Buffer *buf)
+{
+    FILE *fp = fopen(fname, "w");
+    if (fp) {
+        for (Line *l = buf->beg; l != NULL; l = l->next) {
+            fprintf(fp, "%s\n", l->str);
+        }
+        fclose(fp);
+    }
+}
+
