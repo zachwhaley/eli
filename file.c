@@ -90,6 +90,11 @@ void file_backchar(File *file, int key)
     }
 }
 
+void file_delchar(File *file, int key)
+{
+    line_erase(file->pos, file->col);
+}
+
 void file_addchar(File *file, int key)
 {
     line_insert(file->pos, file->col, key);

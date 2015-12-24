@@ -52,6 +52,7 @@ Action normal_actions[] = {
     { 'j',       file_nextline, NORMAL },
     { 'k',       file_prevline, NORMAL },
     { 'l',       file_nextchar, NORMAL },
+    { 'x',       file_delchar,  NORMAL },
 };
 Mode normal_mode = {
     .exit_key = CTRL('q'),
@@ -71,6 +72,7 @@ Action insert_actions[] = {
     { '\n',          file_newline,   INSERT },
     { '\r',          file_newline,   INSERT },
     { KEY_BACKSPACE, file_backchar,  INSERT },
+    { KEY_DC,        file_delchar,   INSERT },
     { CTRL('i'),     NULL,           NORMAL },
 };
 Mode insert_mode = {

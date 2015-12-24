@@ -25,6 +25,7 @@ void file_nextline(File *file, int key);
 void file_prevline(File *file, int key);
 void file_newline(File *file, int key);
 void file_backchar(File *file, int key);
+void file_delchar(File *file, int key);
 void file_addchar(File *file, int key);
 
 #endif /* __ELI_FILE_H__ */
