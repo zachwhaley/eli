@@ -166,8 +166,7 @@ static void display()
 {
     // Refresh title window
     char title[titlewin.cols];
-    snprintf(title, sizeof(title), " %s %lu,%lu",
-             (file.name) ? file.name : "#No File#", file.row, file.col);
+    snprintf(title, sizeof(title), " %s %lu,%lu", (file.name) ?: "#No File#", file.row, file.col);
     wclear(titlewin.win);
     mvwaddstr(titlewin.win, 0, 0, title);
     for (size_t col = strlen(title); col < titlewin.cols; col++) {
