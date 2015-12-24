@@ -5,7 +5,7 @@
 
 Line * line_new(const char *str, size_t len)
 {
-    Line *l = (Line *)calloc(1, sizeof(Line));
+    Line *l = calloc(1, sizeof(Line));
     if (str) {
         strncpy(l->str, str, len);
     }
