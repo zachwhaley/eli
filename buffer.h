@@ -3,8 +3,6 @@
 
 #include "line.h"
 
-#include <stdio.h>
-
 typedef struct {
     Line *beg, *end;
 } Buffer;
