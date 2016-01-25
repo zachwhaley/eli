@@ -73,7 +73,7 @@ Action insert_actions[] = {
     { '\r',          file_newline,   INSERT },
     { KEY_BACKSPACE, file_backchar,  INSERT },
     { KEY_DC,        file_delchar,   INSERT },
-    { CTRL('i'),     NULL,           NORMAL },
+    { CTRL('e'),     NULL,           NORMAL },
 };
 Mode insert_mode = {
     .exit_key = CTRL('q'),
