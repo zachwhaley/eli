@@ -1,4 +1,4 @@
-# eli (short for Eliana)
+# eli (Pronounced Ellie)
 
 A bare bones text editor written in C
 
@@ -18,13 +18,13 @@ $ sudo dnf install gcc
 
 ## What it Does
 
-Displays a files content on the screen.
+Displays a file on the screen.
 
 Move around with <kbd>h</kbd> <kbd>j</kbd> <kbd>k</kbd> and <kbd>l</kbd>.
 
 Enter insert mode with <kbd>i</kbd> and type some things.
 
-Exit insert mode with <kbd>Ctrl-i</kbd>
+Exit insert mode with <kbd>Ctrl-e</kbd>
 
 Use <kbd>Ctrl-w</kbd> to save and <kbd>Ctrl-q</kbd> to quit.
 
