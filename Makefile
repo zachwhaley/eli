@@ -1,4 +1,4 @@
-CFLAGS = -g -Wall -Werror
+CFLAGS = -g -ggdb -Wall -Werror
 LDLIBS = -lncurses
 
 PRGM  = eli
@@ -15,6 +15,6 @@ $(PRGM): $(OBJS)
 	$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
 
 clean:
-	rm -rf $(OBJS) $(DEPS) $(PRGM)
+	$(RM) -r $(OBJS) $(DEPS) $(PRGM)
 
 -include $(DEPS)
