@@ -2,6 +2,45 @@
 #include "line.h"
 
 #include <stdlib.h>
+#include <string.h>
+
+Buffer * buf_new()
+{
+    Buffer *buf = calloc(1, sizeof(Buffer));
+    Line *l = line_new(NULL, 0);
+    buf_pushback(buf, l);
+    return buf;
+}
+
+void buf_free(Buffer *buf)
+{
+    buf_clear(buf);
+    free(buf);
+}
+
+void buf_read(Buffer *buf)
+{
+    FILE *fp = fopen(buf->name, "r");
+    if (fp) {
+        char in[BUFSIZ];
+        while (fgets(in, BUFSIZ, fp) != NULL) {
+            Line *l = line_new(in, strlen(in) - 1);
+            buf_pushback(buf, l);
+        }
+        fclose(fp);
+    }
+}
+
+void buf_write(Buffer *buf)
+{
+    FILE *fp = fopen(buf->name, "w");
+    if (fp) {
+        for (Line *l = buf->beg; l != NULL; l = l->next) {
+            fprintf(fp, "%s\n", l->str);
+        }
+        fclose(fp);
+    }
+}
 
 void buf_pushback(Buffer *buf, Line *line)
 {

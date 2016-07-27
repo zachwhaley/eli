@@ -3,11 +3,10 @@
 
 #include <stdio.h>
 
-typedef struct Line Line;
-struct Line {
+typedef struct Line_ {
     char str[BUFSIZ];
-    Line *prev, *next;
-};
+    struct Line_ *prev, *next;
+} Line;
 
 Line * line_new(const char *str, size_t len);
 void line_free(Line *line);

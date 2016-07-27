@@ -4,9 +4,15 @@
 #include "line.h"
 
 typedef struct {
-    Line *beg, *end;
+    const char *name;
+    Line *pos, *beg, *end;
+    size_t row, col;
 } Buffer;
 
+Buffer * buf_new();
+void buf_free(Buffer *buf);
+void buf_read(Buffer *buf);
+void buf_write(Buffer *buf);
 void buf_pushfront(Buffer *buf, Line *line);
 void buf_pushback(Buffer *buf, Line *line);
 void buf_insert(Buffer *buf, Line *dst, Line *line);
