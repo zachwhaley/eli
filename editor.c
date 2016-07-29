@@ -58,15 +58,14 @@ void setmode(Editor *e, MODE m)
     }
 }
 
-void * readfile(void *ctx, int key)
+void readfile(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
     buf_clear(e->buf);
     buf_read(e->buf);
-    return e;
 }
 
-void * writefile(void *ctx, int key)
+void writefile(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
     if (!e->buf->name) {
@@ -74,24 +73,21 @@ void * writefile(void *ctx, int key)
         e->buf->name = getinput(e, input, "Save as:");
     }
     buf_write(e->buf);
-    return e;
 }
 
-void * begofline(void *ctx, int key)
+void begofline(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
     e->buf->col = 0;
-    return e;
 }
 
-void * endofline(void *ctx, int key)
+void endofline(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
     e->buf->col = strlen(e->buf->pos->str);
-    return e;
 }
 
-void * nextchar(void *ctx, int key)
+void nextchar(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
     if (e->buf->col + 1 <= strlen(e->buf->pos->str)) {
@@ -101,10 +97,9 @@ void * nextchar(void *ctx, int key)
         nextline(e, key);
         begofline(e, key);
     }
-    return e;
 }
 
-void * prevchar(void *ctx, int key)
+void prevchar(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
     if (e->buf->col > 0) {
@@ -114,10 +109,9 @@ void * prevchar(void *ctx, int key)
         prevline(e, key);
         endofline(e, key);
     }
-    return e;
 }
 
-void * nextline(void *ctx, int key)
+void nextline(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
     Line *nline = e->buf->pos->next;
@@ -127,10 +121,9 @@ void * nextline(void *ctx, int key)
     }
     if (e->buf->col > strlen(e->buf->pos->str))
         endofline(e, key);
-    return e;
 }
 
-void * prevline(void *ctx, int key)
+void prevline(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
     Line *pline = e->buf->pos->prev;
@@ -140,10 +133,9 @@ void * prevline(void *ctx, int key)
     }
     if (e->buf->col > strlen(e->buf->pos->str))
         endofline(e, key);
-    return e;
 }
 
-void * newline(void *ctx, int key)
+void newline(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
     char *split = e->buf->pos->str + e->buf->col;
@@ -158,10 +150,9 @@ void * newline(void *ctx, int key)
     }
     nextline(e, key);
     begofline(e, key);
-    return e;
 }
 
-void * backchar(void *ctx, int key)
+void backchar(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
     Line *l = e->buf->pos;
@@ -175,22 +166,19 @@ void * backchar(void *ctx, int key)
     else {
         line_erase(e->buf->pos, e->buf->col);
     }
-    return e;
 }
 
-void * delchar(void *ctx, int key)
+void delchar(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
     line_erase(e->buf->pos, e->buf->col);
-    return e;
 }
 
-void * addchar(void *ctx, int key)
+void addchar(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
     line_insert(e->buf->pos, e->buf->col, key);
     nextchar(e, key);
-    return e;
 }
 
 static char * getinput(Editor *e, char *input, const char *msg)

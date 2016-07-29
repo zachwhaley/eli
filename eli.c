@@ -104,7 +104,7 @@ static void eli_edit(Editor *eli)
             Action action = eli->mode.actions[ndx];
             if (action.key == key) {
                 if (action.func)
-                    eli = action.func(eli, key);
+                    action.func(eli, key);
                 setmode(eli, action.nextmode);
                 break;
             }
