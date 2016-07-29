@@ -24,7 +24,7 @@ Move around with <kbd>h</kbd> <kbd>j</kbd> <kbd>k</kbd> and <kbd>l</kbd>.
 
 Enter insert mode with <kbd>i</kbd> and type some things.
 
-Exit insert mode with <kbd>Ctrl-e</kbd>
+Exit insert mode with <kbd>Ctrl-c</kbd>
 
 Use <kbd>Ctrl-w</kbd> to save and <kbd>Ctrl-q</kbd> to quit.
 
