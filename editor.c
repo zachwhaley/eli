@@ -1,5 +1,6 @@
 #include "editor.h"
 
+#include <ctype.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -15,6 +16,8 @@ static Action normal_actions[] = {
     { 'j',       nextline,  NORMAL },
     { 'k',       prevline,  NORMAL },
     { 'l',       nextchar,  NORMAL },
+    { 'w',       nextword,  NORMAL },
+    { 'b',       prevword,  NORMAL },
     { 'x',       delchar,   NORMAL },
 };
 static const Mode normal_mode = {
@@ -116,6 +119,44 @@ bool prevchar(void *ctx, int key)
         prevline(e, key);
         endofline(e, key);
         return true;
+    }
+    return false;
+}
+
+bool nextword(void *ctx, int key)
+{
+    Editor *e = (Editor *)ctx;
+    while (nextchar(e, key)) {
+        char ch = e->buf->line->str[e->buf->col];
+        if (!isblank(ch) && ch != '\0') {
+            if (e->buf->col == 0) {
+                return true;
+            }
+            else {
+                char pchar = e->buf->line->str[e->buf->col - 1];
+                if (isblank(pchar))
+                    return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool prevword(void *ctx, int key)
+{
+    Editor *e = (Editor *)ctx;
+    while (prevchar(e, key)) {
+        char ch = e->buf->line->str[e->buf->col];
+        if (!isblank(ch) && ch != '\0') {
+            if (e->buf->col == 0) {
+                return true;
+            }
+            else {
+                char pchar = e->buf->line->str[e->buf->col - 1];
+                if (isblank(pchar))
+                    return true;
+            }
+        }
     }
     return false;
 }

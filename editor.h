@@ -19,6 +19,8 @@ bool begofline(void *ctx, int key);
 bool endofline(void *ctx, int key);
 bool nextchar(void *ctx, int key);
 bool prevchar(void *ctx, int key);
+bool nextword(void *ctx, int key);
+bool prevword(void *ctx, int key);
 bool nextline(void *ctx, int key);
 bool prevline(void *ctx, int key);
 bool newline(void *ctx, int key);
