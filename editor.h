@@ -13,17 +13,17 @@ typedef struct {
 } Editor;
 
 void setmode(Editor *e, MODE m);
-void readfile(void *ctx, int key);
-void writefile(void *ctx, int key);
-void begofline(void *ctx, int key);
-void endofline(void *ctx, int key);
-void nextchar(void *ctx, int key);
-void prevchar(void *ctx, int key);
-void nextline(void *ctx, int key);
-void prevline(void *ctx, int key);
-void newline(void *ctx, int key);
-void backchar(void *ctx, int key);
-void delchar(void *ctx, int key);
-void addchar(void *ctx, int key);
+bool readfile(void *ctx, int key);
+bool writefile(void *ctx, int key);
+bool begofline(void *ctx, int key);
+bool endofline(void *ctx, int key);
+bool nextchar(void *ctx, int key);
+bool prevchar(void *ctx, int key);
+bool nextline(void *ctx, int key);
+bool prevline(void *ctx, int key);
+bool newline(void *ctx, int key);
+bool backchar(void *ctx, int key);
+bool delchar(void *ctx, int key);
+bool addchar(void *ctx, int key);
 
 #endif /* __ELI_EDITOR_H__ */

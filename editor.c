@@ -1,5 +1,6 @@
 #include "editor.h"
 
+#include <stdbool.h>
 #include <string.h>
 
 #define COUNT(x) (sizeof (x) / sizeof *(x))
@@ -58,127 +59,145 @@ void setmode(Editor *e, MODE m)
     }
 }
 
-void readfile(void *ctx, int key)
+bool readfile(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
     buf_clear(e->buf);
-    buf_read(e->buf);
+    return buf_read(e->buf);
 }
 
-void writefile(void *ctx, int key)
+bool writefile(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
     if (!e->buf->name) {
         char input[FILENAME_MAX];
         e->buf->name = getinput(e, input, "Save as:");
     }
-    buf_write(e->buf);
+    return buf_write(e->buf);
 }
 
-void begofline(void *ctx, int key)
+bool begofline(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
     e->buf->col = 0;
+    return true;
 }
 
-void endofline(void *ctx, int key)
+bool endofline(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
-    e->buf->col = strlen(e->buf->pos->str);
+    e->buf->col = strlen(e->buf->line->str);
+    return true;
 }
 
-void nextchar(void *ctx, int key)
+bool nextchar(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
-    if (e->buf->col + 1 <= strlen(e->buf->pos->str)) {
+    if (e->buf->col + 1 <= strlen(e->buf->line->str)) {
         e->buf->col++;
+        return true;
     }
-    else if (e->buf->pos->next) {
+    else if (e->buf->line->next) {
         nextline(e, key);
         begofline(e, key);
+        return true;
     }
+    return false;
 }
 
-void prevchar(void *ctx, int key)
+bool prevchar(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
     if (e->buf->col > 0) {
         e->buf->col--;
+        return true;
     }
-    else if (e->buf->pos->prev) {
+    else if (e->buf->line->prev) {
         prevline(e, key);
         endofline(e, key);
+        return true;
     }
+    return false;
 }
 
-void nextline(void *ctx, int key)
+bool nextline(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
-    Line *nline = e->buf->pos->next;
+    Line *nline = e->buf->line->next;
+    bool rval = false;
     if (nline) {
-        e->buf->pos = nline;
+        e->buf->line = nline;
         e->buf->row++;
+        rval = true;
     }
-    if (e->buf->col > strlen(e->buf->pos->str))
+    if (e->buf->col > strlen(e->buf->line->str))
         endofline(e, key);
+    return rval;
 }
 
-void prevline(void *ctx, int key)
+bool prevline(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
-    Line *pline = e->buf->pos->prev;
+    Line *pline = e->buf->line->prev;
+    bool rval = false;
     if (pline) {
-        e->buf->pos = pline;
+        e->buf->line = pline;
         e->buf->row--;
+        rval = true;
     }
-    if (e->buf->col > strlen(e->buf->pos->str))
+    if (e->buf->col > strlen(e->buf->line->str))
         endofline(e, key);
+    return rval;
 }
 
-void newline(void *ctx, int key)
+bool newline(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
-    char *split = e->buf->pos->str + e->buf->col;
+    char *split = e->buf->line->str + e->buf->col;
     size_t len = strlen(split);
     Line *l = line_new(split, len);
     memset(split, '\0', len);
-    if (e->buf->pos->next) {
-        buf_insert(e->buf, e->buf->pos->next, l);
+    if (e->buf->line->next) {
+        buf_insert(e->buf, e->buf->line->next, l);
     }
     else {
         buf_pushback(e->buf, l);
     }
     nextline(e, key);
     begofline(e, key);
+    return true;
 }
 
-void backchar(void *ctx, int key)
+bool backchar(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
-    Line *l = e->buf->pos;
+    Line *l = e->buf->line;
     prevchar(e, key);
     // If we moved to the previous line, we need to bring what was left of the line below to
     // our current line
-    if (e->buf->pos == l->prev) {
-        line_pushback(e->buf->pos, l->str, strlen(l->str));
+    if (e->buf->line == l->prev) {
+        line_pushback(e->buf->line, l->str, strlen(l->str));
         buf_erase(e->buf, l);
     }
     else {
-        line_erase(e->buf->pos, e->buf->col);
+        line_erase(e->buf->line, e->buf->col);
     }
+    return true;
 }
 
-void delchar(void *ctx, int key)
+bool delchar(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
-    line_erase(e->buf->pos, e->buf->col);
+    line_erase(e->buf->line, e->buf->col);
+    return true;
 }
 
-void addchar(void *ctx, int key)
+bool addchar(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
-    line_insert(e->buf->pos, e->buf->col, key);
+    line_insert(e->buf->line, e->buf->col, key);
     nextchar(e, key);
+    return true;
 }
 
 static char * getinput(Editor *e, char *input, const char *msg)

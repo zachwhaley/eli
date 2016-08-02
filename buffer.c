@@ -18,7 +18,7 @@ void buf_free(Buffer *buf)
     free(buf);
 }
 
-void buf_read(Buffer *buf)
+bool buf_read(Buffer *buf)
 {
     FILE *fp = fopen(buf->name, "r");
     if (fp) {
@@ -28,10 +28,12 @@ void buf_read(Buffer *buf)
             buf_pushback(buf, l);
         }
         fclose(fp);
+        return true;
     }
+    return false;
 }
 
-void buf_write(Buffer *buf)
+bool buf_write(Buffer *buf)
 {
     FILE *fp = fopen(buf->name, "w");
     if (fp) {
@@ -39,7 +41,9 @@ void buf_write(Buffer *buf)
             fprintf(fp, "%s\n", l->str);
         }
         fclose(fp);
+        return true;
     }
+    return false;
 }
 
 void buf_pushback(Buffer *buf, Line *line)

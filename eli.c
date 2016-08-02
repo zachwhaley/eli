@@ -31,7 +31,7 @@ static void eli_init(Editor *eli, int ac, const char *av[])
         eli->buf->name = av[1];
         readfile(eli, 0);
     }
-    eli->buf->pos = eli->buf->beg;
+    eli->buf->line = eli->buf->beg;
 
     setmode(eli, NORMAL);
 }

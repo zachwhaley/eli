@@ -1,7 +1,9 @@
 #ifndef __ELI_MODE_H__
 #define __ELI_MODE_H__
 
-typedef void (*action_func)(void *, int);
+#include <stdbool.h>
+
+typedef bool (*action_func)(void *, int);
 
 typedef enum {
     NORMAL,
