@@ -62,21 +62,21 @@ static void eli_display(Editor *eli)
         eli->textwin.top = eli->buf->row;
     }
     // Refresh text window
-    size_t wline;
-    Line *fline = eli->buf->beg;
-    for (wline = 0; wline < eli->textwin.top && fline; wline++) {
-        fline = fline->next;
+    size_t winrow;
+    Line *wline = eli->buf->beg;
+    for (winrow = 0; winrow < eli->textwin.top && wline; winrow++) {
+        wline = wline->next;
     }
-    for (wline = 0; wline < eli->textwin.lines; wline++) {
-        wmove(eli->textwin.win, wline, 0);
+    for (winrow = 0; winrow < eli->textwin.lines; winrow++) {
+        wmove(eli->textwin.win, winrow, 0);
         for (size_t col = 0; col < eli->textwin.cols; col++) {
-            if (fline && col < strlen(fline->str))
-                waddch(eli->textwin.win, fline->str[col]);
+            if (wline && col < strlen(wline->str))
+                waddch(eli->textwin.win, wline->str[col]);
             else
                 waddch(eli->textwin.win, ' ');
         }
-        if (fline)
-            fline = fline->next;
+        if (wline)
+            wline = wline->next;
     }
     // Set cursor File
     int cur_y = eli->buf->row - eli->textwin.top;
