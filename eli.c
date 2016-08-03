@@ -27,6 +27,7 @@ static void eli_init(Editor *eli, int ac, const char *av[])
     keypad(eli->textwin.win, true);
 
     eli->buf = buf_new();
+    eli->beg = eli->end = eli->buf;
     if (ac > 1) {
         eli->buf->name = av[1];
         readfile(eli, 0);
@@ -37,7 +38,12 @@ static void eli_init(Editor *eli, int ac, const char *av[])
 
 static void eli_term(Editor *eli)
 {
-    buf_free(eli->buf);
+    Buffer *buf = eli->beg;
+    while (buf) {
+        Buffer *nbuf = buf->next;
+        buf_free(buf);
+        buf = nbuf;
+    }
 }
 
 static void eli_display(Editor *eli)
