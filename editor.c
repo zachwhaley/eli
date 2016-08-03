@@ -12,6 +12,7 @@ static Action normal_actions[] = {
     { CTRL('w'), writefile, NORMAL },
     { CTRL('t'), newbuf,    NORMAL },
     { 'i',       NULL,      INSERT },
+    { 'g',       begofbuf,  NORMAL },
     { 'a',       nextchar,  INSERT },
     { 'h',       prevchar,  NORMAL },
     { 'j',       nextline,  NORMAL },
@@ -249,6 +250,15 @@ bool newbuf(void *ctx, int key)
     buf->prev = e->buf;
     e->buf->next = buf;
     e->buf = buf;
+    return true;
+}
+
+bool begofbuf(void *ctx, int key)
+{
+    Editor *e = (Editor *)ctx;
+    e->buf->line = e->buf->beg;
+    e->buf->row = 0;
+    begofline(e, key);
     return true;
 }
 
