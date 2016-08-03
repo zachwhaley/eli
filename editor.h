@@ -8,7 +8,7 @@
 typedef struct {
     Window titlewin;
     Window textwin;
-    Buffer *buf;
+    Buffer *buf, *beg, *end;
     Mode mode;
 } Editor;
 
@@ -27,5 +27,6 @@ bool newline(void *ctx, int key);
 bool backchar(void *ctx, int key);
 bool delchar(void *ctx, int key);
 bool addchar(void *ctx, int key);
+bool newbuf(void *ctx, int key);
 
 #endif /* __ELI_EDITOR_H__ */

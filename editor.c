@@ -10,6 +10,7 @@
 // Modal Actions
 static Action normal_actions[] = {
     { CTRL('w'), writefile, NORMAL },
+    { CTRL('t'), newbuf,    NORMAL },
     { 'i',       NULL,      INSERT },
     { 'a',       nextchar,  INSERT },
     { 'h',       prevchar,  NORMAL },
@@ -238,6 +239,16 @@ bool addchar(void *ctx, int key)
     Editor *e = (Editor *)ctx;
     line_insert(e->buf->line, e->buf->col, key);
     nextchar(e, key);
+    return true;
+}
+
+bool newbuf(void *ctx, int key)
+{
+    Editor *e = (Editor *)ctx;
+    Buffer *buf = buf_new();
+    buf->prev = e->buf;
+    e->buf->next = buf;
+    e->buf = buf;
     return true;
 }
 

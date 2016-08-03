@@ -5,8 +5,9 @@
 
 #include <stdbool.h>
 
-typedef struct {
+typedef struct Buffer_ {
     const char *name;
+    struct Buffer_ *prev, *next;
     Line *line, *beg, *end;
     size_t row, col;
 } Buffer;

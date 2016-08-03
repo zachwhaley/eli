@@ -9,12 +9,14 @@ Buffer * buf_new()
     Buffer *buf = calloc(1, sizeof(Buffer));
     Line *l = line_new(NULL, 0);
     buf_pushback(buf, l);
+    buf->line = l;
     return buf;
 }
 
 void buf_free(Buffer *buf)
 {
     buf_clear(buf);
+    buf->next = buf->prev = NULL;
     free(buf);
 }
 
@@ -27,6 +29,7 @@ bool buf_read(Buffer *buf)
             Line *l = line_new(in, strlen(in) - 1);
             buf_pushback(buf, l);
         }
+        buf->line = buf->beg;
         fclose(fp);
         return true;
     }
