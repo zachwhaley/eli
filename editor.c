@@ -10,8 +10,9 @@
 // Modal Actions
 static Action normal_actions[] = {
     { CTRL('w'), writefile, NORMAL },
-    { CTRL('n'), nextbuf,   NORMAL },
     { CTRL('t'), newbuf,    NORMAL },
+    { CTRL('n'), nextbuf,   NORMAL },
+    { CTRL('p'), prevbuf,   NORMAL },
     { 'i',       NULL,      INSERT },
     { 'g',       begofbuf,  NORMAL },
     { 'G',       endofbuf,  NORMAL },
@@ -264,6 +265,19 @@ bool nextbuf(void *ctx, int key)
     }
     else {
         e->buf = e->beg;
+    }
+    begofbuf(e, key);
+    return true;
+}
+
+bool prevbuf(void *ctx, int key)
+{
+    Editor *e = (Editor *)ctx;
+    if (e->buf->prev) {
+        e->buf = e->buf->prev;
+    }
+    else {
+        e->buf = e->end;
     }
     begofbuf(e, key);
     return true;
