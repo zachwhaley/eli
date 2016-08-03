@@ -9,6 +9,7 @@ typedef struct Buffer_ {
     const char *name;
     struct Buffer_ *prev, *next;
     Line *line, *beg, *end;
+    size_t size;
     size_t row, col;
 } Buffer;
 

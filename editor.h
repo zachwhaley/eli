@@ -30,5 +30,6 @@ bool addchar(void *ctx, int key);
 bool newbuf(void *ctx, int key);
 bool nextbuf(void *ctx, int key);
 bool begofbuf(void *ctx, int key);
+bool endofbuf(void *ctx, int key);
 
 #endif /* __ELI_EDITOR_H__ */

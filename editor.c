@@ -14,6 +14,7 @@ static Action normal_actions[] = {
     { CTRL('t'), newbuf,    NORMAL },
     { 'i',       NULL,      INSERT },
     { 'g',       begofbuf,  NORMAL },
+    { 'G',       endofbuf,  NORMAL },
     { 'a',       nextchar,  INSERT },
     { 'h',       prevchar,  NORMAL },
     { 'j',       nextline,  NORMAL },
@@ -274,6 +275,15 @@ bool begofbuf(void *ctx, int key)
     e->buf->line = e->buf->beg;
     e->buf->row = 0;
     begofline(e, key);
+    return true;
+}
+
+bool endofbuf(void *ctx, int key)
+{
+    Editor *e = (Editor *)ctx;
+    e->buf->line = e->buf->end;
+    e->buf->row = e->buf->size - 1;
+    endofline(e, key);
     return true;
 }
 

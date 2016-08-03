@@ -59,6 +59,7 @@ void buf_pushback(Buffer *buf, Line *line)
     else {
         buf->beg = buf->end = line;
     }
+    buf->size++;
 }
 
 void buf_pushfront(Buffer *buf, Line *line)
@@ -71,6 +72,7 @@ void buf_pushfront(Buffer *buf, Line *line)
     else {
         buf->beg = buf->end = line;
     }
+    buf->size++;
 }
 
 void buf_insert(Buffer *buf, Line *dst, Line *line)
@@ -81,6 +83,7 @@ void buf_insert(Buffer *buf, Line *dst, Line *line)
         line->next->prev = line;
     if (line->prev)
         line->prev->next = line;
+    buf->size++;
 }
 
 void buf_erase(Buffer *buf, Line *line)
@@ -94,7 +97,7 @@ void buf_erase(Buffer *buf, Line *line)
         buf->end = line->prev;
     else
         line->next->prev = line->prev;
-
+    buf->size--;
     free(line);
 }
 
@@ -106,5 +109,6 @@ void buf_clear(Buffer *buf)
         line_free(l);
         l = nl;
     }
+    buf->size = 0;
     buf->beg = buf->end = NULL;
 }
