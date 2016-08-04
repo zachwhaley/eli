@@ -251,10 +251,15 @@ bool newbuf(void *ctx, int key)
 {
     Editor *e = (Editor *)ctx;
     Buffer *buf = buf_new();
-    buf->prev = e->buf;
-    e->buf->next = buf;
+    buf->next = e->buf;
+    buf->prev = e->buf->prev;
+    if (buf->next)
+        buf->next->prev = buf;
+    if (buf->prev)
+        buf->prev->next = buf;
+    if (e->beg == e->buf)
+        e->beg = buf;
     e->buf = buf;
-    e->end = buf;
     return true;
 }
 
