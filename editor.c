@@ -266,7 +266,6 @@ bool nextbuf(void *ctx, int key)
     else {
         e->buf = e->beg;
     }
-    begofbuf(e, key);
     return true;
 }
 
@@ -279,7 +278,6 @@ bool prevbuf(void *ctx, int key)
     else {
         e->buf = e->end;
     }
-    begofbuf(e, key);
     return true;
 }
 
