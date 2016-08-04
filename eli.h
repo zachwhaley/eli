@@ -10,9 +10,9 @@ typedef struct {
     Window textwin;
     Buffer *buf, *beg, *end;
     Mode mode;
-} Editor;
+} Eli;
 
-void setmode(Editor *e, MODE m);
+void setmode(Eli *e, MODE m);
 bool readfile(void *ctx, int key);
 bool writefile(void *ctx, int key);
 bool begofline(void *ctx, int key);
