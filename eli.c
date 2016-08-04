@@ -29,7 +29,7 @@ static void eli_init(Editor *eli, int ac, const char *av[])
     eli->buf = buf_new();
     eli->beg = eli->end = eli->buf;
     if (ac > 1) {
-        eli->buf->name = av[1];
+        eli->buf->name = strdup(av[1]);
         readfile(eli, 0);
     }
 

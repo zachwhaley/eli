@@ -17,6 +17,7 @@ void buf_free(Buffer *buf)
 {
     buf_clear(buf);
     buf->next = buf->prev = NULL;
+    free(buf->name);
     free(buf);
 }
 

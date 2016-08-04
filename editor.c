@@ -79,7 +79,8 @@ bool writefile(void *ctx, int key)
     Editor *e = (Editor *)ctx;
     if (!e->buf->name) {
         char input[FILENAME_MAX];
-        e->buf->name = getinput(e, input, "Save as:");
+        getinput(e, input, "Save as:");
+        e->buf->name = strdup(input);
     }
     return buf_write(e->buf);
 }

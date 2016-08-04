@@ -6,7 +6,7 @@
 #include <stdbool.h>
 
 typedef struct Buffer_ {
-    const char *name;
+    char *name;
     struct Buffer_ *prev, *next;
     Line *line, *beg, *end;
     size_t size;
