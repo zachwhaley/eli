@@ -9,8 +9,9 @@
 
 // Modal Actions
 static Action normal_actions[] = {
-    { CTRL('w'), writefile, NORMAL },
+    { CTRL('s'), writefile, NORMAL },
     { CTRL('t'), newbuf,    NORMAL },
+    { CTRL('w'), delbuf,    NORMAL },
     { CTRL('n'), nextbuf,   NORMAL },
     { CTRL('p'), prevbuf,   NORMAL },
     { 'i',       NULL,      INSERT },
@@ -33,7 +34,7 @@ static const Mode normal_mode = {
 };
 
 static Action insert_actions[] = {
-    { CTRL('w'),     writefile, INSERT },
+    { CTRL('s'),     writefile, INSERT },
     { KEY_HOME,      begofline, INSERT },
     { KEY_END,       endofline, INSERT },
     { KEY_UP,        prevline,  INSERT },
@@ -260,6 +261,23 @@ bool newbuf(void *ctx, int key)
     if (e->beg == e->buf)
         e->beg = buf;
     e->buf = buf;
+    return true;
+}
+
+bool delbuf(void *ctx, int key)
+{
+    Editor *e = (Editor *)ctx;
+    Buffer *buf = e->buf;
+    if (buf == e->beg)
+        e->beg = buf->next;
+    else
+        buf->prev->next = buf->next;
+    if (buf == e->end)
+        e->end = buf->prev;
+    else
+        buf->next->prev = buf->prev;
+    e->buf = buf->next ?: e->beg;
+    buf_free(buf);
     return true;
 }
 

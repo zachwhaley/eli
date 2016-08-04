@@ -48,6 +48,12 @@ static void eli_term(Editor *eli)
 
 static void eli_display(Editor *eli)
 {
+    // Make sure we always have a buffer
+    if (!eli->buf) {
+        eli->buf = buf_new();
+        eli->beg = eli->end = eli->buf;
+    }
+
     // Refresh title window
     char title[eli->titlewin.cols];
     int ndx = 0;
