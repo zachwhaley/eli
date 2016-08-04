@@ -50,7 +50,13 @@ static void eli_display(Editor *eli)
 {
     // Refresh title window
     char title[eli->titlewin.cols];
-    snprintf(title, sizeof(title), " %s %lu,%lu", eli->buf->name ?: "#No File#", eli->buf->row, eli->buf->col);
+    int ndx = 0;
+    Buffer *buf = eli->buf;
+    do {
+        ndx += snprintf(&title[ndx], sizeof(title) - ndx, " %s :", buf->name ?: "#No File#");
+        buf = buf->next ?: eli->beg;
+    } while (buf != eli->buf);
+    snprintf(&title[ndx], sizeof(title) - ndx, " %lu,%lu", eli->buf->row, eli->buf->col);
     wclear(eli->titlewin.win);
     mvwaddstr(eli->titlewin.win, 0, 0, title);
     for (size_t col = strlen(title); col < eli->titlewin.cols; col++) {
