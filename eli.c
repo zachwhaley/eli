@@ -59,7 +59,7 @@ static void eli_display(Editor *eli)
     int ndx = 0;
     Buffer *buf = eli->buf;
     do {
-        ndx += snprintf(&title[ndx], sizeof(title) - ndx, " %s :", buf->name ?: "#No File#");
+        ndx += snprintf(&title[ndx], sizeof(title) - ndx, " %s :", buf->name ?: "[No Name]");
         buf = buf->next ?: eli->beg;
     } while (buf != eli->buf);
     snprintf(&title[ndx], sizeof(title) - ndx, " %lu,%lu", eli->buf->row, eli->buf->col);
