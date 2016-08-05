@@ -1,6 +1,6 @@
 # eli (Pronounced Ellie)
 
-A bare bones text editor written in C
+A simply made text editor written in C
 
 ## Libraries
 
