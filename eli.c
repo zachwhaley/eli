@@ -25,10 +25,11 @@ static Action normal_actions[] = {
     { 'w',       nextword,  NORMAL },
     { 'b',       prevword,  NORMAL },
     { 'x',       delchar,   NORMAL },
+    // Default Action
+    { '\0',      NULL,      NORMAL },
 };
 static const Mode normal_mode = {
     .exit_key = CTRL('q'),
-    .default_action = NULL,
     .actions = normal_actions,
     .count = COUNT(normal_actions),
 };
@@ -46,10 +47,11 @@ static Action insert_actions[] = {
     { KEY_BACKSPACE, backchar,  INSERT },
     { KEY_DC,        delchar,   INSERT },
     { CTRL('c'),     NULL,      NORMAL },
+    // Default Action
+    { '\0',          addchar,   INSERT },
 };
 static const Mode insert_mode = {
     .exit_key = CTRL('q'),
-    .default_action = addchar,
     .actions = insert_actions,
     .count = COUNT(insert_actions),
 };
@@ -71,6 +73,9 @@ void setmode(Eli *e, MODE m)
 bool readfile(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
+    if (!e->buf->name) {
+        return false;
+    }
     buf_clear(e->buf);
     return buf_read(e->buf);
 }

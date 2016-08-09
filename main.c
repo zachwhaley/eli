@@ -117,18 +117,21 @@ static void eli_edit(Eli *eli)
 
         // Find an action for the key
         int ndx;
+        Action action = {};
         for (ndx = 0; ndx < eli->mode.count; ndx++) {
-            Action action = eli->mode.actions[ndx];
+            action = eli->mode.actions[ndx];
             if (action.key == key) {
                 if (action.func)
                     action.func(eli, key);
-                setmode(eli, action.nextmode);
-                break;
+                goto done;
             }
         }
         // If no action found, resort to the default action
-        if (ndx == eli->mode.count && eli->mode.default_action)
-            eli->mode.default_action(eli, key);
+        if (action.func) {
+            action.func(eli, key);
+        }
+done:
+        setmode(eli, action.nextmode);
     }
 }
 

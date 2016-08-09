@@ -18,7 +18,6 @@ typedef struct {
 
 typedef struct {
     int exit_key;
-    action_func default_action;
     Action *actions;
     size_t count;
 } Mode;
