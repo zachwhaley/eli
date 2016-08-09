@@ -7,9 +7,31 @@
 #define COUNT(x) (sizeof (x) / sizeof *(x))
 #define CTRL(chr) (chr & 037)
 
+static bool readfile(void *ctx, int key);
+static bool writefile(void *ctx, int key);
+static bool begofline(void *ctx, int key);
+static bool endofline(void *ctx, int key);
+static bool nextchar(void *ctx, int key);
+static bool prevchar(void *ctx, int key);
+static bool nextword(void *ctx, int key);
+static bool prevword(void *ctx, int key);
+static bool nextline(void *ctx, int key);
+static bool prevline(void *ctx, int key);
+static bool newline(void *ctx, int key);
+static bool backchar(void *ctx, int key);
+static bool delchar(void *ctx, int key);
+static bool addchar(void *ctx, int key);
+static bool newbuf(void *ctx, int key);
+static bool delbuf(void *ctx, int key);
+static bool nextbuf(void *ctx, int key);
+static bool prevbuf(void *ctx, int key);
+static bool begofbuf(void *ctx, int key);
+static bool endofbuf(void *ctx, int key);
+
 // Modal Actions
 static Action normal_actions[] = {
     { CTRL('s'), writefile, NORMAL },
+    { CTRL('r'), readfile,  NORMAL },
     { CTRL('t'), newbuf,    NORMAL },
     { CTRL('w'), delbuf,    NORMAL },
     { CTRL('n'), nextbuf,   NORMAL },
@@ -70,7 +92,7 @@ void setmode(Eli *e, MODE m)
     }
 }
 
-bool readfile(void *ctx, int key)
+static bool readfile(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     if (!e->buf->name) {
@@ -80,7 +102,7 @@ bool readfile(void *ctx, int key)
     return buf_read(e->buf);
 }
 
-bool writefile(void *ctx, int key)
+static bool writefile(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     if (!e->buf->name) {
@@ -91,21 +113,21 @@ bool writefile(void *ctx, int key)
     return buf_write(e->buf);
 }
 
-bool begofline(void *ctx, int key)
+static bool begofline(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     e->buf->col = 0;
     return true;
 }
 
-bool endofline(void *ctx, int key)
+static bool endofline(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     e->buf->col = strlen(e->buf->line->str);
     return true;
 }
 
-bool nextchar(void *ctx, int key)
+static bool nextchar(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     if (e->buf->col + 1 <= strlen(e->buf->line->str)) {
@@ -120,7 +142,7 @@ bool nextchar(void *ctx, int key)
     return false;
 }
 
-bool prevchar(void *ctx, int key)
+static bool prevchar(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     if (e->buf->col > 0) {
@@ -135,7 +157,7 @@ bool prevchar(void *ctx, int key)
     return false;
 }
 
-bool nextword(void *ctx, int key)
+static bool nextword(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     while (nextchar(e, key)) {
@@ -154,7 +176,7 @@ bool nextword(void *ctx, int key)
     return false;
 }
 
-bool prevword(void *ctx, int key)
+static bool prevword(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     while (prevchar(e, key)) {
@@ -173,7 +195,7 @@ bool prevword(void *ctx, int key)
     return false;
 }
 
-bool nextline(void *ctx, int key)
+static bool nextline(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     Line *nline = e->buf->line->next;
@@ -188,7 +210,7 @@ bool nextline(void *ctx, int key)
     return rval;
 }
 
-bool prevline(void *ctx, int key)
+static bool prevline(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     Line *pline = e->buf->line->prev;
@@ -203,7 +225,7 @@ bool prevline(void *ctx, int key)
     return rval;
 }
 
-bool newline(void *ctx, int key)
+static bool newline(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     char *split = e->buf->line->str + e->buf->col;
@@ -221,7 +243,7 @@ bool newline(void *ctx, int key)
     return true;
 }
 
-bool backchar(void *ctx, int key)
+static bool backchar(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     Line *l = e->buf->line;
@@ -238,14 +260,14 @@ bool backchar(void *ctx, int key)
     return true;
 }
 
-bool delchar(void *ctx, int key)
+static bool delchar(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     line_erase(e->buf->line, e->buf->col);
     return true;
 }
 
-bool addchar(void *ctx, int key)
+static bool addchar(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     line_insert(e->buf->line, e->buf->col, key);
@@ -253,7 +275,7 @@ bool addchar(void *ctx, int key)
     return true;
 }
 
-bool newbuf(void *ctx, int key)
+static bool newbuf(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     Buffer *buf = buf_new();
@@ -269,7 +291,7 @@ bool newbuf(void *ctx, int key)
     return true;
 }
 
-bool delbuf(void *ctx, int key)
+static bool delbuf(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     Buffer *buf = e->buf;
@@ -286,7 +308,7 @@ bool delbuf(void *ctx, int key)
     return true;
 }
 
-bool nextbuf(void *ctx, int key)
+static bool nextbuf(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     if (e->buf->next) {
@@ -298,7 +320,7 @@ bool nextbuf(void *ctx, int key)
     return true;
 }
 
-bool prevbuf(void *ctx, int key)
+static bool prevbuf(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     if (e->buf->prev) {
@@ -310,7 +332,7 @@ bool prevbuf(void *ctx, int key)
     return true;
 }
 
-bool begofbuf(void *ctx, int key)
+static bool begofbuf(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     e->buf->line = e->buf->beg;
@@ -319,7 +341,7 @@ bool begofbuf(void *ctx, int key)
     return true;
 }
 
-bool endofbuf(void *ctx, int key)
+static bool endofbuf(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
     e->buf->line = e->buf->end;

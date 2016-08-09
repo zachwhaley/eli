@@ -30,7 +30,8 @@ static void eli_init(Eli *eli, int ac, const char *av[])
     eli->beg = eli->end = eli->buf;
     if (ac > 1) {
         eli->buf->name = strdup(av[1]);
-        readfile(eli, 0);
+        buf_clear(eli->buf);
+        buf_read(eli->buf);
     }
 
     setmode(eli, NORMAL);
