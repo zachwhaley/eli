@@ -4,12 +4,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-Buffer * buf_new()
+Buffer * buf_new(const char *name)
 {
     Buffer *buf = calloc(1, sizeof(Buffer));
-    Line *l = line_new(NULL, 0);
-    buf_pushback(buf, l);
-    buf->line = l;
+    if (name) {
+        buf_read(buf, name);
+        buf->name = strdup(name);
+    }
+    else {
+        Line *l = line_new(NULL, 0);
+        buf_pushback(buf, l);
+        buf->line = l;
+    }
     return buf;
 }
 
@@ -22,9 +28,10 @@ void buf_free(Buffer *buf)
     free(buf);
 }
 
-bool buf_read(Buffer *buf)
+bool buf_read(Buffer *buf, const char *name)
 {
-    FILE *fp = fopen(buf->name, "r");
+    buf_clear(buf);
+    FILE *fp = fopen(name ?: buf->name, "r");
     if (fp) {
         char in[BUFSIZ];
         while (fgets(in, BUFSIZ, fp) != NULL) {
@@ -38,9 +45,9 @@ bool buf_read(Buffer *buf)
     return false;
 }
 
-bool buf_write(Buffer *buf)
+bool buf_write(Buffer *buf, const char *name)
 {
-    FILE *fp = fopen(buf->name, "w");
+    FILE *fp = fopen(name ?: buf->name, "w");
     if (fp) {
         for (Line *l = buf->beg; l != NULL; l = l->next) {
             fprintf(fp, "%s\n", l->str);

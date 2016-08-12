@@ -15,8 +15,8 @@ typedef struct Buffer_ {
 
 Buffer * buf_new();
 void buf_free(Buffer *buf);
-bool buf_read(Buffer *buf);
-bool buf_write(Buffer *buf);
+bool buf_read(Buffer *buf, const char *name);
+bool buf_write(Buffer *buf, const char *name);
 void buf_pushfront(Buffer *buf, Line *line);
 void buf_pushback(Buffer *buf, Line *line);
 void buf_insert(Buffer *buf, Line *dst, Line *line);

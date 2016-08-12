@@ -26,13 +26,10 @@ static void eli_init(Eli *eli, int ac, const char *av[])
     eli->textwin.bot = eli->textwin.lines - 1;
     keypad(eli->textwin.win, true);
 
-    eli->buf = buf_new();
-    eli->beg = eli->end = eli->buf;
     if (ac > 1) {
-        eli->buf->name = strdup(av[1]);
-        buf_clear(eli->buf);
-        buf_read(eli->buf);
+        eli->buf = buf_new(av[1]);
     }
+    eli->beg = eli->end = eli->buf;
 
     setmode(eli, NORMAL);
 }
@@ -51,7 +48,7 @@ static void eli_display(Eli *eli)
 {
     // Make sure we always have a buffer
     if (!eli->buf) {
-        eli->buf = buf_new();
+        eli->buf = buf_new(NULL);
         eli->beg = eli->end = eli->buf;
     }
 

@@ -95,11 +95,7 @@ void setmode(Eli *e, MODE m)
 static bool readfile(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
-    if (!e->buf->name) {
-        return false;
-    }
-    buf_clear(e->buf);
-    return buf_read(e->buf);
+    return buf_read(e->buf, NULL);
 }
 
 static bool writefile(void *ctx, int key)
@@ -110,7 +106,7 @@ static bool writefile(void *ctx, int key)
         getinput(e, input, "Save as:");
         e->buf->name = strdup(input);
     }
-    return buf_write(e->buf);
+    return buf_write(e->buf, NULL);
 }
 
 static bool begofline(void *ctx, int key)
@@ -278,7 +274,7 @@ static bool addchar(void *ctx, int key)
 static bool newbuf(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
-    Buffer *buf = buf_new();
+    Buffer *buf = buf_new(NULL);
     buf->next = e->buf;
     buf->prev = e->buf->prev;
     if (buf->next)
