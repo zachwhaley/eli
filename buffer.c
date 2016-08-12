@@ -119,5 +119,6 @@ void buf_clear(Buffer *buf)
         l = nl;
     }
     buf->size = 0;
-    buf->beg = buf->end = NULL;
+    buf->row = buf->col = 0;
+    buf->line = buf->beg = buf->end = NULL;
 }

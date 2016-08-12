@@ -4,6 +4,7 @@
 
 #include <ctype.h>
 #include <string.h>
+#include <stdlib.h>
 
 static void getinput(Eli *e, char *input, const char *cmd);
 static bool runcmd(Eli *e, const char *cmd, const char *arg);
@@ -273,6 +274,13 @@ static bool runcmd(Eli *e, const char *cmd, const char *arg)
 {
     if (streq(cmd, "save")) {
         return buf_write(e->buf, arg);
+    }
+    if (streq(cmd, "open")) {
+        if (arg) {
+            free(e->buf->name);
+            e->buf->name = strdup(arg);
+        }
+        return buf_read(e->buf, arg);
     }
     return false;
 }

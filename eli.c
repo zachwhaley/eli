@@ -7,7 +7,7 @@
 // Modal Actions
 static Action normal_actions[] = {
     { CTRL('s'), writefile, NORMAL },
-    { CTRL('r'), readfile,  NORMAL },
+    { CTRL('o'), readfile,  NORMAL },
     { CTRL('t'), newbuf,    NORMAL },
     { CTRL('w'), delbuf,    NORMAL },
     { CTRL('n'), nextbuf,   NORMAL },
