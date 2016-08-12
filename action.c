@@ -271,7 +271,7 @@ static void getinput(Eli *e, char *input, const char *cmd)
 
 static bool runcmd(Eli *e, const char *cmd, const char *arg)
 {
-    if (streq(cmd, "write")) {
+    if (streq(cmd, "save")) {
         return buf_write(e->buf, arg);
     }
     return false;
