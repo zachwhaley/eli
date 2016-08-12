@@ -15,14 +15,18 @@ static void eli_term(Eli *eli);
 static void eli_init(Eli *eli, int ac, const char *av[])
 {
     const size_t cols = COLS, lines = LINES;
-    eli->titlewin.win = newwin(1, cols, lines - 1, 0);
+    eli->cmdwin.win = newwin(1, cols, lines - 1, 0);
+    eli->cmdwin.cols = cols;
+    eli->cmdwin.lines = 1;
+
+    eli->titlewin.win = newwin(1, cols, lines - 2, 0);
     eli->titlewin.cols = cols;
     eli->titlewin.lines = 1;
     wattron(eli->titlewin.win, A_REVERSE);
 
-    eli->textwin.win = newwin(lines - 1, cols, 0, 0);
+    eli->textwin.win = newwin(lines - 2, cols, 0, 0);
     eli->textwin.cols = cols;
-    eli->textwin.lines = lines - 1;
+    eli->textwin.lines = lines - 2;
     eli->textwin.bot = eli->textwin.lines - 1;
     keypad(eli->textwin.win, true);
 
@@ -42,6 +46,9 @@ static void eli_term(Eli *eli)
         buf_free(buf);
         buf = nbuf;
     }
+    delwin(eli->cmdwin.win);
+    delwin(eli->titlewin.win);
+    delwin(eli->textwin.win);
 }
 
 static void eli_display(Eli *eli)

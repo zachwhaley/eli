@@ -1,4 +1,5 @@
 #include "eli.h"
+#include "str.h"
 
 #include <ctype.h>
 #include <stdbool.h>
@@ -7,6 +8,7 @@
 #define COUNT(x) (sizeof (x) / sizeof *(x))
 #define CTRL(chr) (chr & 037)
 
+static bool command(void *ctx, int key);
 static bool readfile(void *ctx, int key);
 static bool writefile(void *ctx, int key);
 static bool begofline(void *ctx, int key);
@@ -28,6 +30,9 @@ static bool prevbuf(void *ctx, int key);
 static bool begofbuf(void *ctx, int key);
 static bool endofbuf(void *ctx, int key);
 
+static void getinput(Eli *e, char *input, const char *cmd);
+static bool runcmd(Eli *e, const char *cmd, const char *arg);
+
 // Modal Actions
 static Action normal_actions[] = {
     { CTRL('s'), writefile, NORMAL },
@@ -47,6 +52,7 @@ static Action normal_actions[] = {
     { 'w',       nextword,  NORMAL },
     { 'b',       prevword,  NORMAL },
     { 'x',       delchar,   NORMAL },
+    { ':',       command,   NORMAL },
     // Default Action
     { '\0',      NULL,      NORMAL },
 };
@@ -78,8 +84,6 @@ static const Mode insert_mode = {
     .count = COUNT(insert_actions),
 };
 
-static char * getinput(Eli *e, char *input, const char *msg);
-
 void setmode(Eli *e, MODE m)
 {
     switch (m) {
@@ -92,6 +96,23 @@ void setmode(Eli *e, MODE m)
     }
 }
 
+static bool command(void *ctx, int key)
+{
+    Eli *e = (Eli *)ctx;
+    char input[BUFSIZ] = {};
+    getinput(e, input, NULL);
+    if (strlen(input) == 0)
+        return false;
+
+    char *cmd = strtrim(input);
+    char *arg = strchr(cmd, ' ');
+    if (arg) {
+        *arg = '\0';
+        arg = arg + 1;
+    }
+    return runcmd(e, cmd, arg);
+}
+
 static bool readfile(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
@@ -101,11 +122,6 @@ static bool readfile(void *ctx, int key)
 static bool writefile(void *ctx, int key)
 {
     Eli *e = (Eli *)ctx;
-    if (!e->buf->name) {
-        char input[FILENAME_MAX];
-        getinput(e, input, "Save as:");
-        e->buf->name = strdup(input);
-    }
     return buf_write(e->buf, NULL);
 }
 
@@ -346,23 +362,26 @@ static bool endofbuf(void *ctx, int key)
     return true;
 }
 
-static char * getinput(Eli *e, char *input, const char *msg)
+static void getinput(Eli *e, char *input, const char *cmd)
 {
-    // Title message
-    wclear(e->titlewin.win);
-    mvwaddstr(e->titlewin.win, 0, 0, msg);
-
-    // User input area
-    wattroff(e->titlewin.win, A_REVERSE);
-    waddch(e->titlewin.win, ' ');
-    wrefresh(e->titlewin.win);
+    // Command prompt
+    mvwaddstr(e->cmdwin.win, 0, 0, ":");
+    wrefresh(e->cmdwin.win);
 
     // Get user input
     echo();
-    wgetstr(e->titlewin.win, input);
+    wgetstr(e->cmdwin.win, input);
     noecho();
 
-    // Make the title window white again
-    wattron(e->titlewin.win, A_REVERSE);
-    return input;
+    // Clear command prompt
+    wclear(e->cmdwin.win);
+    wrefresh(e->cmdwin.win);
+}
+
+static bool runcmd(Eli *e, const char *cmd, const char *arg)
+{
+    if (streq(cmd, "write")) {
+        return buf_write(e->buf, arg);
+    }
+    return false;
 }

@@ -6,8 +6,7 @@
 #include "window.h"
 
 typedef struct {
-    Window titlewin;
-    Window textwin;
+    Window cmdwin, titlewin, textwin;
     Buffer *buf, *beg, *end;
     Mode mode;
 } Eli;
