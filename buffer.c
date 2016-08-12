@@ -7,15 +7,9 @@
 Buffer * buf_new(const char *name)
 {
     Buffer *buf = calloc(1, sizeof(Buffer));
-    if (name) {
-        buf_read(buf, name);
+    if (name)
         buf->name = strdup(name);
-    }
-    else {
-        Line *l = line_new(NULL, 0);
-        buf_pushback(buf, l);
-        buf->line = l;
-    }
+    buf_read(buf, name);
     return buf;
 }
 
@@ -41,6 +35,11 @@ bool buf_read(Buffer *buf, const char *name)
         buf->line = buf->beg;
         fclose(fp);
         return true;
+    }
+    else {
+        Line *l = line_new(NULL, 0);
+        buf_pushback(buf, l);
+        buf->line = l;
     }
     return false;
 }
