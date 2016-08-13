@@ -28,6 +28,8 @@ Exit insert mode with <kbd>Ctrl-c</kbd>
 
 Use <kbd>Ctrl-s</kbd> to save and <kbd>Ctrl-q</kbd> to quit.
 
+And more...
+
 ## How to Use it
 
 ```bash
