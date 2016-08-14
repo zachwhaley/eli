@@ -1,4 +1,4 @@
-CFLAGS = -g -ggdb -Wall -Werror
+CFLAGS = -std=gnu11 -g -ggdb -Wall -Werror
 LDLIBS = -lncurses
 
 PRGM  = eli
