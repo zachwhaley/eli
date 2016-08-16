@@ -52,12 +52,6 @@ static void eli_term(struct Eli *eli)
 
 static void eli_display(struct Eli *eli)
 {
-    // Make sure we always have a buffer
-    if (!eli->buf) {
-        eli->buf = buf_new(NULL);
-        eli->beg = eli->end = eli->buf;
-    }
-
     // Refresh title window
     char title[eli->titlewin.cols];
     struct Buffer *buf = eli->buf;
@@ -112,6 +106,11 @@ static void eli_display(struct Eli *eli)
 static void eli_edit(struct Eli *eli)
 {
     while (true) {
+        // Make sure we always have a buffer
+        if (!eli->buf) {
+            eli->buf = buf_new(NULL);
+            eli->beg = eli->end = eli->buf;
+        }
         eli_display(eli);
 
         int key = wgetch(eli->textwin.win);
