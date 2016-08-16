@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-char * strtrim(char *str)
+char* strtrim(char *str)
 {
     // Trim leading space
     while (isspace(*str))

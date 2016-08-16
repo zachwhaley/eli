@@ -1,15 +1,18 @@
 #include "action.h"
-#include "str.h"
+
 #include "eli.h"
+#include "str.h"
+#include "line.h"
+#include "buffer.h"
 
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 
-static void getinput(Eli *e, char *input, const char *cmd);
-static bool runcmd(Eli *e, const char *cmd, const char *arg);
+static void getinput(struct Eli *e, char *input, const char *cmd);
+static bool runcmd(struct Eli *e, const char *cmd, const char *arg);
 
-bool command(Eli *e, int key)
+bool command(struct Eli *e, int key)
 {
     char input[BUFSIZ] = {};
     getinput(e, input, NULL);
@@ -25,29 +28,29 @@ bool command(Eli *e, int key)
     return runcmd(e, cmd, arg);
 }
 
-bool readfile(Eli *e, int key)
+bool readfile(struct Eli *e, int key)
 {
     return buf_read(e->buf, NULL);
 }
 
-bool writefile(Eli *e, int key)
+bool writefile(struct Eli *e, int key)
 {
     return buf_write(e->buf, NULL);
 }
 
-bool begofline(Eli *e, int key)
+bool begofline(struct Eli *e, int key)
 {
     e->buf->col = 0;
     return true;
 }
 
-bool endofline(Eli *e, int key)
+bool endofline(struct Eli *e, int key)
 {
     e->buf->col = strlen(e->buf->line->str);
     return true;
 }
 
-bool nextchar(Eli *e, int key)
+bool nextchar(struct Eli *e, int key)
 {
     if (e->buf->col + 1 <= strlen(e->buf->line->str)) {
         e->buf->col++;
@@ -61,7 +64,7 @@ bool nextchar(Eli *e, int key)
     return false;
 }
 
-bool prevchar(Eli *e, int key)
+bool prevchar(struct Eli *e, int key)
 {
     if (e->buf->col > 0) {
         e->buf->col--;
@@ -75,7 +78,7 @@ bool prevchar(Eli *e, int key)
     return false;
 }
 
-bool nextword(Eli *e, int key)
+bool nextword(struct Eli *e, int key)
 {
     while (nextchar(e, key)) {
         char ch = e->buf->line->str[e->buf->col];
@@ -93,7 +96,7 @@ bool nextword(Eli *e, int key)
     return false;
 }
 
-bool prevword(Eli *e, int key)
+bool prevword(struct Eli *e, int key)
 {
     while (prevchar(e, key)) {
         char ch = e->buf->line->str[e->buf->col];
@@ -111,9 +114,9 @@ bool prevword(Eli *e, int key)
     return false;
 }
 
-bool nextline(Eli *e, int key)
+bool nextline(struct Eli *e, int key)
 {
-    Line *nline = e->buf->line->next;
+    struct Line *nline = e->buf->line->next;
     bool rval = false;
     if (nline) {
         e->buf->line = nline;
@@ -125,9 +128,9 @@ bool nextline(Eli *e, int key)
     return rval;
 }
 
-bool prevline(Eli *e, int key)
+bool prevline(struct Eli *e, int key)
 {
-    Line *pline = e->buf->line->prev;
+    struct Line *pline = e->buf->line->prev;
     bool rval = false;
     if (pline) {
         e->buf->line = pline;
@@ -139,11 +142,11 @@ bool prevline(Eli *e, int key)
     return rval;
 }
 
-bool newline(Eli *e, int key)
+bool newline(struct Eli *e, int key)
 {
     char *split = e->buf->line->str + e->buf->col;
     size_t len = strlen(split);
-    Line *l = line_new(split, len);
+    struct Line *l = line_new(split, len);
     memset(split, '\0', len);
     if (e->buf->line->next) {
         buf_insert(e->buf, e->buf->line->next, l);
@@ -156,9 +159,9 @@ bool newline(Eli *e, int key)
     return true;
 }
 
-bool backchar(Eli *e, int key)
+bool backchar(struct Eli *e, int key)
 {
-    Line *l = e->buf->line;
+    struct Line *l = e->buf->line;
     prevchar(e, key);
     // If we moved to the previous line, we need to bring what was left of the line below to
     // our current line
@@ -172,22 +175,22 @@ bool backchar(Eli *e, int key)
     return true;
 }
 
-bool delchar(Eli *e, int key)
+bool delchar(struct Eli *e, int key)
 {
     line_erase(e->buf->line, e->buf->col);
     return true;
 }
 
-bool addchar(Eli *e, int key)
+bool addchar(struct Eli *e, int key)
 {
     line_insert(e->buf->line, e->buf->col, key);
     nextchar(e, key);
     return true;
 }
 
-bool newbuf(Eli *e, int key)
+bool newbuf(struct Eli *e, int key)
 {
-    Buffer *buf = buf_new(NULL);
+    struct Buffer *buf = buf_new(NULL);
     buf->next = e->buf;
     buf->prev = e->buf->prev;
     if (buf->next)
@@ -200,9 +203,9 @@ bool newbuf(Eli *e, int key)
     return true;
 }
 
-bool delbuf(Eli *e, int key)
+bool delbuf(struct Eli *e, int key)
 {
-    Buffer *buf = e->buf;
+    struct Buffer *buf = e->buf;
     if (buf == e->beg)
         e->beg = buf->next;
     else
@@ -216,7 +219,7 @@ bool delbuf(Eli *e, int key)
     return true;
 }
 
-bool nextbuf(Eli *e, int key)
+bool nextbuf(struct Eli *e, int key)
 {
     if (e->buf->next) {
         e->buf = e->buf->next;
@@ -227,7 +230,7 @@ bool nextbuf(Eli *e, int key)
     return true;
 }
 
-bool prevbuf(Eli *e, int key)
+bool prevbuf(struct Eli *e, int key)
 {
     if (e->buf->prev) {
         e->buf = e->buf->prev;
@@ -238,7 +241,7 @@ bool prevbuf(Eli *e, int key)
     return true;
 }
 
-bool begofbuf(Eli *e, int key)
+bool begofbuf(struct Eli *e, int key)
 {
     e->buf->line = e->buf->beg;
     e->buf->row = 0;
@@ -246,7 +249,7 @@ bool begofbuf(Eli *e, int key)
     return true;
 }
 
-bool endofbuf(Eli *e, int key)
+bool endofbuf(struct Eli *e, int key)
 {
     e->buf->line = e->buf->end;
     e->buf->row = e->buf->size - 1;
@@ -254,7 +257,7 @@ bool endofbuf(Eli *e, int key)
     return true;
 }
 
-static void getinput(Eli *e, char *input, const char *cmd)
+static void getinput(struct Eli *e, char *input, const char *cmd)
 {
     // Command prompt
     mvwaddstr(e->cmdwin.win, 0, 0, ":");
@@ -270,7 +273,7 @@ static void getinput(Eli *e, char *input, const char *cmd)
     wrefresh(e->cmdwin.win);
 }
 
-static bool runcmd(Eli *e, const char *cmd, const char *arg)
+static bool runcmd(struct Eli *e, const char *cmd, const char *arg)
 {
     if (streq(cmd, "save")) {
         return buf_write(e->buf, arg);

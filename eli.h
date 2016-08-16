@@ -1,35 +1,34 @@
 #ifndef __ELI_EDITOR_H__
 #define __ELI_EDITOR_H__
 
-#include "buffer.h"
 #include "window.h"
 
-struct Eli_;
+struct Eli;
+struct Buffer;
 
-typedef enum {
+enum MODE {
     NORMAL,
     INSERT,
-} MODE;
+};
 
-typedef bool (*action_func)(struct Eli_ *, int);
-typedef struct {
+struct Action {
     int key;
-    action_func func;
-    MODE nextmode;
-} Action;
+    bool (*func)(struct Eli*, int);
+    enum MODE nextmode;
+};
 
-typedef struct {
+struct Mode {
     int exit_key;
-    Action *actions;
+    struct Action *actions;
     size_t count;
-} Mode;
+};
 
-typedef struct Eli_ {
-    Window cmdwin, titlewin, textwin;
-    Buffer *buf, *beg, *end;
-    Mode mode;
-} Eli;
+struct Eli {
+    struct Window cmdwin, titlewin, textwin;
+    struct Buffer *buf, *beg, *end;
+    struct Mode mode;
+};
 
-void setmode(Eli *e, MODE m);
+void setmode(struct Eli *e, enum MODE m);
 
 #endif /* __ELI_EDITOR_H__ */

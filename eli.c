@@ -1,11 +1,13 @@
 #include "eli.h"
+
 #include "action.h"
+#include "buffer.h"
 
 #define COUNT(x) (sizeof (x) / sizeof *(x))
 #define CTRL(chr) (chr & 037)
 
 // Modal Actions
-static Action normal_actions[] = {
+static struct Action normal_actions[] = {
     { CTRL('s'), writefile, NORMAL },
     { CTRL('o'), readfile,  NORMAL },
     { CTRL('t'), newbuf,    NORMAL },
@@ -27,13 +29,13 @@ static Action normal_actions[] = {
     // Default Action
     { '\0',      NULL,      NORMAL },
 };
-static const Mode normal_mode = {
+static const struct Mode normal_mode = {
     .exit_key = CTRL('q'),
     .actions = normal_actions,
     .count = COUNT(normal_actions),
 };
 
-static Action insert_actions[] = {
+static struct Action insert_actions[] = {
     { CTRL('s'),     writefile, INSERT },
     { KEY_HOME,      begofline, INSERT },
     { KEY_END,       endofline, INSERT },
@@ -49,13 +51,13 @@ static Action insert_actions[] = {
     // Default Action
     { '\0',          addchar,   INSERT },
 };
-static const Mode insert_mode = {
+static const struct Mode insert_mode = {
     .exit_key = CTRL('q'),
     .actions = insert_actions,
     .count = COUNT(insert_actions),
 };
 
-void setmode(Eli *e, MODE m)
+void setmode(struct Eli *e, enum MODE m)
 {
     switch (m) {
         case INSERT:

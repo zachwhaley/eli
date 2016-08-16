@@ -1,19 +1,21 @@
 #include "buffer.h"
+
 #include "line.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-Buffer * buf_new(const char *name)
+struct Buffer* buf_new(const char *name)
 {
-    Buffer *buf = calloc(1, sizeof(Buffer));
+    struct Buffer *buf = calloc(1, sizeof(struct Buffer));
     if (name)
         buf->name = strdup(name);
     buf_read(buf, name);
     return buf;
 }
 
-void buf_free(Buffer *buf)
+void buf_free(struct Buffer *buf)
 {
     buf_clear(buf);
     buf->next = buf->prev = NULL;
@@ -22,14 +24,14 @@ void buf_free(Buffer *buf)
     free(buf);
 }
 
-bool buf_read(Buffer *buf, const char *name)
+bool buf_read(struct Buffer *buf, const char *name)
 {
     buf_clear(buf);
     FILE *fp = fopen(name ?: buf->name, "r");
     if (fp) {
         char in[BUFSIZ];
         while (fgets(in, BUFSIZ, fp) != NULL) {
-            Line *l = line_new(in, strlen(in) - 1);
+            struct Line *l = line_new(in, strlen(in) - 1);
             buf_pushback(buf, l);
         }
         buf->line = buf->beg;
@@ -37,18 +39,18 @@ bool buf_read(Buffer *buf, const char *name)
         return true;
     }
     else {
-        Line *l = line_new(NULL, 0);
+        struct Line *l = line_new(NULL, 0);
         buf_pushback(buf, l);
         buf->line = l;
     }
     return false;
 }
 
-bool buf_write(Buffer *buf, const char *name)
+bool buf_write(struct Buffer *buf, const char *name)
 {
     FILE *fp = fopen(name ?: buf->name, "w");
     if (fp) {
-        for (Line *l = buf->beg; l != NULL; l = l->next) {
+        for (struct Line *l = buf->beg; l != NULL; l = l->next) {
             fprintf(fp, "%s\n", l->str);
         }
         fclose(fp);
@@ -57,7 +59,7 @@ bool buf_write(Buffer *buf, const char *name)
     return false;
 }
 
-void buf_pushback(Buffer *buf, Line *line)
+void buf_pushback(struct Buffer *buf, struct Line *line)
 {
     if (buf->end) {
         line->prev = buf->end;
@@ -70,7 +72,7 @@ void buf_pushback(Buffer *buf, Line *line)
     buf->size++;
 }
 
-void buf_pushfront(Buffer *buf, Line *line)
+void buf_pushfront(struct Buffer *buf, struct Line *line)
 {
     if (buf->beg) {
         line->next = buf->beg;
@@ -83,7 +85,7 @@ void buf_pushfront(Buffer *buf, Line *line)
     buf->size++;
 }
 
-void buf_insert(Buffer *buf, Line *dst, Line *line)
+void buf_insert(struct Buffer *buf, struct Line *dst, struct Line *line)
 {
     line->next = dst;
     line->prev = dst->prev;
@@ -94,7 +96,7 @@ void buf_insert(Buffer *buf, Line *dst, Line *line)
     buf->size++;
 }
 
-void buf_erase(Buffer *buf, Line *line)
+void buf_erase(struct Buffer *buf, struct Line *line)
 {
     if (line == buf->beg)
         buf->beg = line->next;
@@ -109,11 +111,11 @@ void buf_erase(Buffer *buf, Line *line)
     free(line);
 }
 
-void buf_clear(Buffer *buf)
+void buf_clear(struct Buffer *buf)
 {
-    Line *l = buf->beg;
+    struct Line *l = buf->beg;
     while (l) {
-        Line *nl = l->next;
+        struct Line *nl = l->next;
         line_free(l);
         l = nl;
     }

@@ -1,18 +1,17 @@
 #include "eli.h"
+#include "line.h"
+#include "buffer.h"
 
 #include <ncurses.h>
 
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
-static void eli_init(Eli *eli, int ac, const char *av[]);
-static void eli_edit(Eli *eli);
-static void eli_display(Eli *eli);
-static void eli_term(Eli *eli);
+static void eli_init(struct Eli *eli, int ac, const char *av[]);
+static void eli_edit(struct Eli *eli);
+static void eli_display(struct Eli *eli);
+static void eli_term(struct Eli *eli);
 
-static void eli_init(Eli *eli, int ac, const char *av[])
+static void eli_init(struct Eli *eli, int ac, const char *av[])
 {
     const size_t cols = COLS, lines = LINES;
     eli->cmdwin.win = newwin(1, cols, lines - 1, 0);
@@ -38,11 +37,11 @@ static void eli_init(Eli *eli, int ac, const char *av[])
     setmode(eli, NORMAL);
 }
 
-static void eli_term(Eli *eli)
+static void eli_term(struct Eli *eli)
 {
-    Buffer *buf = eli->beg;
+    struct Buffer *buf = eli->beg;
     while (buf) {
-        Buffer *nbuf = buf->next;
+        struct Buffer *nbuf = buf->next;
         buf_free(buf);
         buf = nbuf;
     }
@@ -51,7 +50,7 @@ static void eli_term(Eli *eli)
     delwin(eli->textwin.win);
 }
 
-static void eli_display(Eli *eli)
+static void eli_display(struct Eli *eli)
 {
     // Make sure we always have a buffer
     if (!eli->buf) {
@@ -61,8 +60,8 @@ static void eli_display(Eli *eli)
 
     // Refresh title window
     char title[eli->titlewin.cols];
+    struct Buffer *buf = eli->buf;
     int ndx = 0;
-    Buffer *buf = eli->buf;
     do {
         ndx += snprintf(&title[ndx], sizeof(title) - ndx, " %s :", buf->name ?: "[No Name]");
         buf = buf->next ?: eli->beg;
@@ -85,7 +84,7 @@ static void eli_display(Eli *eli)
     }
     // Refresh text window
     size_t winrow;
-    Line *wline = eli->buf->beg;
+    struct Line *wline = eli->buf->beg;
     for (winrow = 0; winrow < eli->textwin.top && wline; winrow++) {
         wline = wline->next;
     }
@@ -110,7 +109,7 @@ static void eli_display(Eli *eli)
     doupdate();
 }
 
-static void eli_edit(Eli *eli)
+static void eli_edit(struct Eli *eli)
 {
     while (true) {
         eli_display(eli);
@@ -122,7 +121,7 @@ static void eli_edit(Eli *eli)
 
         // Find an action for the key
         int ndx;
-        Action action = {};
+        struct Action action = {};
         for (ndx = 0; ndx < eli->mode.count; ndx++) {
             action = eli->mode.actions[ndx];
             if (action.key == key) {
@@ -146,7 +145,7 @@ int main(int argc, const char *argv[])
     raw();
     noecho();
 
-    Eli eli = {};
+    struct Eli eli = {};
     eli_init(&eli, argc, argv);
     eli_edit(&eli);
     eli_term(&eli);

@@ -3,10 +3,10 @@
 
 #include <ncurses.h>
 
-typedef struct {
+struct Window {
     WINDOW *win;
     size_t cols, lines;
     size_t top, bot;
-} Window;
+};
 
 #endif /* __ELI_WINDOW_H__ */
