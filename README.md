@@ -1,8 +1,8 @@
 # eli /ɛli/
 
-Short for Eliana and pronounced Ellie.
+Short for Eliana and pronounced Ellie
 
-A simply made text editor written in C.
+eli is a simply made text editor written in C
 
 ## What You Need
 
