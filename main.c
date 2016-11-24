@@ -29,10 +29,18 @@ static void eli_init(struct Eli *eli, int ac, const char *av[])
     eli->textwin.bot = eli->textwin.lines - 1;
     keypad(eli->textwin.win, true);
 
-    if (ac > 1) {
-        eli->buf = buf_new(av[1]);
+    for (int i = ac - 1; i > 0; i--) {
+        struct Buffer *buf = buf_new(av[i]);
+        if (!eli->end) {
+            eli->buf = eli->end = buf;
+        }
+        else {
+            eli->buf->prev = buf;
+            buf->next = eli->buf;
+            eli->buf = buf;
+        }
     }
-    eli->beg = eli->end = eli->buf;
+    eli->beg = eli->buf;
 
     setmode(eli, NORMAL);
 }
