@@ -30,7 +30,7 @@ Exit insert mode with <kbd>Ctrl-c</kbd>
 
 Use <kbd>Ctrl-s</kbd> to save and <kbd>Ctrl-q</kbd> to quit.
 
-See action.h for more
+See `eli.c` for more
 
 ## How to Use it
 
