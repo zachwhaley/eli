@@ -14,7 +14,7 @@ struct Buffer {
     size_t row, col;
 };
 
-struct Buffer* buf_new();
+struct Buffer* buf_new(const char *name);
 void buf_free(struct Buffer *buf);
 bool buf_read(struct Buffer *buf, const char *name);
 bool buf_write(struct Buffer *buf, const char *name);
