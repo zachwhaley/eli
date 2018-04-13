@@ -25,6 +25,9 @@ static struct Action normal_actions[] = {
     { 'w',       nextword,  NORMAL },
     { 'b',       prevword,  NORMAL },
     { 'x',       delchar,   NORMAL },
+    { 'H',       topofwin,  NORMAL },
+    { 'M',       midofwin,  NORMAL },
+    { 'L',       botofwin,  NORMAL },
     { ':',       command,   NORMAL },
     // Default Action
     { '\0',      NULL,      NORMAL },

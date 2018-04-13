@@ -26,5 +26,8 @@ bool nextbuf(struct Eli *e, int key);
 bool prevbuf(struct Eli *e, int key);
 bool begofbuf(struct Eli *e, int key);
 bool endofbuf(struct Eli *e, int key);
+bool topofwin(struct Eli *e, int key);
+bool midofwin(struct Eli *e, int key);
+bool botofwin(struct Eli *e, int key);
 
 #endif /* __ELI_ACTION_H__ */

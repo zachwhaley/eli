@@ -257,6 +257,43 @@ bool endofbuf(struct Eli *e, int key)
     return true;
 }
 
+bool topofwin(struct Eli *e, int key)
+{
+    while (e->buf->row != e->textwin.top) {
+        if (!prevline(e, key)) {
+            break;
+        }
+    }
+    return true;
+}
+
+bool midofwin(struct Eli *e, int key)
+{
+    struct Window *win = &e->textwin;
+    size_t mid = win->top + ((win->bot - win->top) / 2);
+    while (e->buf->row < mid) {
+        if (!nextline(e, key)) {
+            break;
+        }
+    }
+    while (e->buf->row > mid) {
+        if (!prevline(e, key)) {
+            break;
+        }
+    }
+    return true;
+}
+
+bool botofwin(struct Eli *e, int key)
+{
+    while (e->buf->row != e->textwin.bot) {
+        if (!nextline(e, key)) {
+            break;
+        }
+    }
+    return true;
+}
+
 static void getinput(struct Eli *e, char *input, const char *cmd)
 {
     // Command prompt
