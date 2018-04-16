@@ -19,6 +19,11 @@ void line_free(struct Line *line)
     free(line);
 }
 
+size_t line_len(struct Line *line)
+{
+    return strlen(line->str);
+}
+
 void line_pushback(struct Line *line, const char *str, size_t cnt)
 {
     strncat(line->str, str, cnt);

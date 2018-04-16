@@ -10,6 +10,7 @@ struct Line {
 
 struct Line* line_new(const char *str, size_t len);
 void line_free(struct Line *line);
+size_t line_len(struct Line *line);
 void line_pushback(struct Line *line, const char *str, size_t cnt);
 void line_insert(struct Line *line, size_t ndx, char c);
 void line_erase(struct Line *line, size_t ndx);

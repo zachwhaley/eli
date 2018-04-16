@@ -18,6 +18,8 @@ struct Buffer* buf_new(const char *name);
 void buf_free(struct Buffer *buf);
 bool buf_read(struct Buffer *buf, const char *name);
 bool buf_write(struct Buffer *buf, const char *name);
+bool buf_moverow(struct Buffer *buf, size_t row);
+bool buf_movecol(struct Buffer *buf, size_t col);
 void buf_pushfront(struct Buffer *buf, struct Line *line);
 void buf_pushback(struct Buffer *buf, struct Line *line);
 void buf_insert(struct Buffer *buf, struct Line *dst, struct Line *line);

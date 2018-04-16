@@ -104,8 +104,12 @@ static void eli_display(struct Eli *eli)
     }
     // Set cursor File
     int cur_y = eli->buf->row - eli->textwin.top;
-    int cur_x = eli->buf->col;
+    size_t col = eli->buf->col;
+    size_t len = line_len(eli->buf->line);
+    int cur_x = (col < len)? col : len;
     wmove(eli->textwin.win, cur_y, cur_x);
+    eli->textwin.cur_y = cur_y;
+    eli->textwin.cur_x = cur_x;
 
     wnoutrefresh(eli->titlewin.win);
     wnoutrefresh(eli->textwin.win);
@@ -128,9 +132,8 @@ static void eli_edit(struct Eli *eli)
             return;
 
         // Find an action for the key
-        int ndx;
         struct Action action = {};
-        for (ndx = 0; ndx < eli->mode.count; ndx++) {
+        for (int ndx = 0; ndx < eli->mode.count; ndx++) {
             action = eli->mode.actions[ndx];
             if (action.key == eli->key) {
                 if (action.func)

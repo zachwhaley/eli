@@ -46,14 +46,14 @@ bool begofline(struct Eli *e)
 
 bool endofline(struct Eli *e)
 {
-    e->buf->col = strlen(e->buf->line->str);
+    e->buf->col = line_len(e->buf->line);
     return true;
 }
 
 bool nextchar(struct Eli *e)
 {
-    if (e->buf->col + 1 <= strlen(e->buf->line->str)) {
-        e->buf->col++;
+    size_t col = e->buf->col;
+    if (buf_movecol(e->buf, col + 1)) {
         return true;
     }
     else if (e->buf->line->next) {
@@ -66,9 +66,12 @@ bool nextchar(struct Eli *e)
 
 bool prevchar(struct Eli *e)
 {
-    if (e->buf->col > 0) {
-        e->buf->col--;
-        return true;
+    size_t col = e->buf->col;
+    if (col > 0) {
+        if (buf_movecol(e->buf, col - 1))
+            return true;
+        else
+            return endofline(e);
     }
     else if (e->buf->line->prev) {
         prevline(e);
@@ -81,13 +84,15 @@ bool prevchar(struct Eli *e)
 bool nextword(struct Eli *e)
 {
     while (nextchar(e)) {
-        char ch = e->buf->line->str[e->buf->col];
-        if (!isblank(ch) && ch != '\0') {
-            if (e->buf->col == 0) {
+        size_t col = e->buf->col;
+        char *str = e->buf->line->str;
+        char c = str[col];
+        if (!isblank(c) && c != '\0') {
+            if (col == 0) {
                 return true;
             }
             else {
-                char pchar = e->buf->line->str[e->buf->col - 1];
+                char pchar = str[col - 1];
                 if (isblank(pchar))
                     return true;
             }
@@ -99,13 +104,15 @@ bool nextword(struct Eli *e)
 bool prevword(struct Eli *e)
 {
     while (prevchar(e)) {
-        char ch = e->buf->line->str[e->buf->col];
-        if (!isblank(ch) && ch != '\0') {
-            if (e->buf->col == 0) {
+        size_t col = e->buf->col;
+        char *str = e->buf->line->str;
+        char c = str[col];
+        if (!isblank(c) && c != '\0') {
+            if (col == 0) {
                 return true;
             }
             else {
-                char pchar = e->buf->line->str[e->buf->col - 1];
+                char pchar = str[col - 1];
                 if (isblank(pchar))
                     return true;
             }
@@ -116,30 +123,12 @@ bool prevword(struct Eli *e)
 
 bool nextline(struct Eli *e)
 {
-    struct Line *nline = e->buf->line->next;
-    bool rval = false;
-    if (nline) {
-        e->buf->line = nline;
-        e->buf->row++;
-        rval = true;
-    }
-    if (e->buf->col > strlen(e->buf->line->str))
-        endofline(e);
-    return rval;
+    return buf_moverow(e->buf, e->buf->row + 1);
 }
 
 bool prevline(struct Eli *e)
 {
-    struct Line *pline = e->buf->line->prev;
-    bool rval = false;
-    if (pline) {
-        e->buf->line = pline;
-        e->buf->row--;
-        rval = true;
-    }
-    if (e->buf->col > strlen(e->buf->line->str))
-        endofline(e);
-    return rval;
+    return buf_moverow(e->buf, e->buf->row - 1);
 }
 
 bool newline(struct Eli *e)
@@ -177,15 +166,16 @@ bool backchar(struct Eli *e)
 
 bool delchar(struct Eli *e)
 {
-    line_erase(e->buf->line, e->buf->col);
+    size_t ndx = e->textwin.cur_x;
+    line_erase(e->buf->line, ndx);
     return true;
 }
 
 bool addchar(struct Eli *e)
 {
-    line_insert(e->buf->line, e->buf->col, e->key);
-    nextchar(e);
-    return true;
+    size_t ndx = e->textwin.cur_x;
+    line_insert(e->buf->line, ndx, e->key);
+    return buf_movecol(e->buf, ndx + 1);
 }
 
 bool newbuf(struct Eli *e)
@@ -259,37 +249,20 @@ bool endofbuf(struct Eli *e)
 
 bool topofwin(struct Eli *e)
 {
-    while (e->buf->row != e->textwin.top) {
-        if (!prevline(e)) {
-            break;
-        }
-    }
-    return true;
+    return buf_moverow(e->buf, e->textwin.top);
 }
 
 bool midofwin(struct Eli *e)
 {
     struct Window *win = &e->textwin;
     size_t mid = win->top + ((win->bot - win->top) / 2);
-    while (e->buf->row < mid) {
-        if (!nextline(e)) {
-            break;
-        }
-    }
-    while (e->buf->row > mid) {
-        if (!prevline(e)) {
-            break;
-        }
-    }
-    return true;
+    return buf_moverow(e->buf, mid);
 }
 
 bool botofwin(struct Eli *e)
 {
-    while (e->buf->row != e->textwin.bot) {
-        if (!nextline(e)) {
-            break;
-        }
+    if (!buf_moverow(e->buf, e->textwin.bot)) {
+        return endofbuf(e);
     }
     return true;
 }

@@ -59,6 +59,39 @@ bool buf_write(struct Buffer *buf, const char *name)
     return false;
 }
 
+bool buf_moverow(struct Buffer *buf, size_t row)
+{
+    if (row >= buf->size)
+        return false;
+
+    size_t bufrow = buf->row;
+    struct Line *bufline = buf->line;
+    while (bufrow > row) {
+        if (!bufline->prev)
+            return false;
+        bufline = bufline->prev;
+        bufrow--;
+    }
+    while (bufrow < row) {
+        if (!bufline->next)
+            return false;
+        bufline = bufline->next;
+        bufrow++;
+    }
+    buf->row = bufrow;
+    buf->line = bufline;
+    return true;
+}
+
+bool buf_movecol(struct Buffer *buf, size_t col)
+{
+    if (col > line_len(buf->line))
+        return false;
+
+    buf->col = col;
+    return true;
+}
+
 void buf_pushback(struct Buffer *buf, struct Line *line)
 {
     if (buf->end) {
