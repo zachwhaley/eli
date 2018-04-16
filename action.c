@@ -12,7 +12,7 @@
 static void getinput(struct Eli *e, char *input, const char *cmd);
 static bool runcmd(struct Eli *e, const char *cmd, const char *arg);
 
-bool command(struct Eli *e, int key)
+bool command(struct Eli *e)
 {
     char input[BUFSIZ] = {};
     getinput(e, input, NULL);
@@ -28,59 +28,59 @@ bool command(struct Eli *e, int key)
     return runcmd(e, cmd, arg);
 }
 
-bool readfile(struct Eli *e, int key)
+bool readfile(struct Eli *e)
 {
     return buf_read(e->buf, NULL);
 }
 
-bool writefile(struct Eli *e, int key)
+bool writefile(struct Eli *e)
 {
     return buf_write(e->buf, NULL);
 }
 
-bool begofline(struct Eli *e, int key)
+bool begofline(struct Eli *e)
 {
     e->buf->col = 0;
     return true;
 }
 
-bool endofline(struct Eli *e, int key)
+bool endofline(struct Eli *e)
 {
     e->buf->col = strlen(e->buf->line->str);
     return true;
 }
 
-bool nextchar(struct Eli *e, int key)
+bool nextchar(struct Eli *e)
 {
     if (e->buf->col + 1 <= strlen(e->buf->line->str)) {
         e->buf->col++;
         return true;
     }
     else if (e->buf->line->next) {
-        nextline(e, key);
-        begofline(e, key);
+        nextline(e);
+        begofline(e);
         return true;
     }
     return false;
 }
 
-bool prevchar(struct Eli *e, int key)
+bool prevchar(struct Eli *e)
 {
     if (e->buf->col > 0) {
         e->buf->col--;
         return true;
     }
     else if (e->buf->line->prev) {
-        prevline(e, key);
-        endofline(e, key);
+        prevline(e);
+        endofline(e);
         return true;
     }
     return false;
 }
 
-bool nextword(struct Eli *e, int key)
+bool nextword(struct Eli *e)
 {
-    while (nextchar(e, key)) {
+    while (nextchar(e)) {
         char ch = e->buf->line->str[e->buf->col];
         if (!isblank(ch) && ch != '\0') {
             if (e->buf->col == 0) {
@@ -96,9 +96,9 @@ bool nextword(struct Eli *e, int key)
     return false;
 }
 
-bool prevword(struct Eli *e, int key)
+bool prevword(struct Eli *e)
 {
-    while (prevchar(e, key)) {
+    while (prevchar(e)) {
         char ch = e->buf->line->str[e->buf->col];
         if (!isblank(ch) && ch != '\0') {
             if (e->buf->col == 0) {
@@ -114,7 +114,7 @@ bool prevword(struct Eli *e, int key)
     return false;
 }
 
-bool nextline(struct Eli *e, int key)
+bool nextline(struct Eli *e)
 {
     struct Line *nline = e->buf->line->next;
     bool rval = false;
@@ -124,11 +124,11 @@ bool nextline(struct Eli *e, int key)
         rval = true;
     }
     if (e->buf->col > strlen(e->buf->line->str))
-        endofline(e, key);
+        endofline(e);
     return rval;
 }
 
-bool prevline(struct Eli *e, int key)
+bool prevline(struct Eli *e)
 {
     struct Line *pline = e->buf->line->prev;
     bool rval = false;
@@ -138,11 +138,11 @@ bool prevline(struct Eli *e, int key)
         rval = true;
     }
     if (e->buf->col > strlen(e->buf->line->str))
-        endofline(e, key);
+        endofline(e);
     return rval;
 }
 
-bool newline(struct Eli *e, int key)
+bool newline(struct Eli *e)
 {
     char *split = e->buf->line->str + e->buf->col;
     size_t len = strlen(split);
@@ -154,15 +154,15 @@ bool newline(struct Eli *e, int key)
     else {
         buf_pushback(e->buf, l);
     }
-    nextline(e, key);
-    begofline(e, key);
+    nextline(e);
+    begofline(e);
     return true;
 }
 
-bool backchar(struct Eli *e, int key)
+bool backchar(struct Eli *e)
 {
     struct Line *l = e->buf->line;
-    prevchar(e, key);
+    prevchar(e);
     // If we moved to the previous line, we need to bring what was left of the line below to
     // our current line
     if (e->buf->line == l->prev) {
@@ -175,20 +175,20 @@ bool backchar(struct Eli *e, int key)
     return true;
 }
 
-bool delchar(struct Eli *e, int key)
+bool delchar(struct Eli *e)
 {
     line_erase(e->buf->line, e->buf->col);
     return true;
 }
 
-bool addchar(struct Eli *e, int key)
+bool addchar(struct Eli *e)
 {
-    line_insert(e->buf->line, e->buf->col, key);
-    nextchar(e, key);
+    line_insert(e->buf->line, e->buf->col, e->key);
+    nextchar(e);
     return true;
 }
 
-bool newbuf(struct Eli *e, int key)
+bool newbuf(struct Eli *e)
 {
     struct Buffer *buf = buf_new(NULL);
     buf->next = e->buf;
@@ -203,7 +203,7 @@ bool newbuf(struct Eli *e, int key)
     return true;
 }
 
-bool delbuf(struct Eli *e, int key)
+bool delbuf(struct Eli *e)
 {
     struct Buffer *buf = e->buf;
     if (buf == e->beg)
@@ -219,7 +219,7 @@ bool delbuf(struct Eli *e, int key)
     return true;
 }
 
-bool nextbuf(struct Eli *e, int key)
+bool nextbuf(struct Eli *e)
 {
     if (e->buf->next) {
         e->buf = e->buf->next;
@@ -230,7 +230,7 @@ bool nextbuf(struct Eli *e, int key)
     return true;
 }
 
-bool prevbuf(struct Eli *e, int key)
+bool prevbuf(struct Eli *e)
 {
     if (e->buf->prev) {
         e->buf = e->buf->prev;
@@ -241,53 +241,53 @@ bool prevbuf(struct Eli *e, int key)
     return true;
 }
 
-bool begofbuf(struct Eli *e, int key)
+bool begofbuf(struct Eli *e)
 {
     e->buf->line = e->buf->beg;
     e->buf->row = 0;
-    begofline(e, key);
+    begofline(e);
     return true;
 }
 
-bool endofbuf(struct Eli *e, int key)
+bool endofbuf(struct Eli *e)
 {
     e->buf->line = e->buf->end;
     e->buf->row = e->buf->size - 1;
-    endofline(e, key);
+    endofline(e);
     return true;
 }
 
-bool topofwin(struct Eli *e, int key)
+bool topofwin(struct Eli *e)
 {
     while (e->buf->row != e->textwin.top) {
-        if (!prevline(e, key)) {
+        if (!prevline(e)) {
             break;
         }
     }
     return true;
 }
 
-bool midofwin(struct Eli *e, int key)
+bool midofwin(struct Eli *e)
 {
     struct Window *win = &e->textwin;
     size_t mid = win->top + ((win->bot - win->top) / 2);
     while (e->buf->row < mid) {
-        if (!nextline(e, key)) {
+        if (!nextline(e)) {
             break;
         }
     }
     while (e->buf->row > mid) {
-        if (!prevline(e, key)) {
+        if (!prevline(e)) {
             break;
         }
     }
     return true;
 }
 
-bool botofwin(struct Eli *e, int key)
+bool botofwin(struct Eli *e)
 {
     while (e->buf->row != e->textwin.bot) {
-        if (!nextline(e, key)) {
+        if (!nextline(e)) {
             break;
         }
     }

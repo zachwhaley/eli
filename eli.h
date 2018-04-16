@@ -13,7 +13,7 @@ enum MODE {
 
 struct Action {
     int key;
-    bool (*func)(struct Eli*, int);
+    bool (*func)(struct Eli*);
     enum MODE nextmode;
 };
 
@@ -27,6 +27,7 @@ struct Eli {
     struct Window cmdwin, titlewin, textwin;
     struct Buffer *buf, *beg, *end;
     struct Mode mode;
+    int key;
 };
 
 void setmode(struct Eli *e, enum MODE m);

@@ -41,6 +41,7 @@ static void eli_init(struct Eli *eli, int ac, const char *av[])
         }
     }
     eli->beg = eli->buf;
+    eli->key = 0;
 
     setmode(eli, NORMAL);
 }
@@ -121,9 +122,9 @@ static void eli_edit(struct Eli *eli)
         }
         eli_display(eli);
 
-        int key = wgetch(eli->textwin.win);
+        eli->key = wgetch(eli->textwin.win);
         // Should we exit?
-        if (key == eli->mode.exit_key)
+        if (eli->key == eli->mode.exit_key)
             return;
 
         // Find an action for the key
@@ -131,15 +132,15 @@ static void eli_edit(struct Eli *eli)
         struct Action action = {};
         for (ndx = 0; ndx < eli->mode.count; ndx++) {
             action = eli->mode.actions[ndx];
-            if (action.key == key) {
+            if (action.key == eli->key) {
                 if (action.func)
-                    action.func(eli, key);
+                    action.func(eli);
                 goto done;
             }
         }
         // If no action found, resort to the default action
         if (action.func) {
-            action.func(eli, key);
+            action.func(eli);
         }
 done:
         setmode(eli, action.nextmode);
