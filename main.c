@@ -61,21 +61,6 @@ static void eli_term(struct Eli *eli)
 
 static void eli_display(struct Eli *eli)
 {
-    // Refresh title window
-    char title[eli->titlewin.cols];
-    struct Buffer *buf = eli->buf;
-    int ndx = 0;
-    do {
-        ndx += snprintf(&title[ndx], sizeof(title) - ndx, " %s :", buf->name ?: "[No Name]");
-        buf = buf->next ?: eli->beg;
-    } while (buf != eli->buf);
-    snprintf(&title[ndx], sizeof(title) - ndx, " %lu,%lu", eli->buf->row, eli->buf->col);
-    wclear(eli->titlewin.win);
-    mvwaddstr(eli->titlewin.win, 0, 0, title);
-    for (size_t col = strlen(title); col < eli->titlewin.cols; col++) {
-        waddch(eli->titlewin.win, ' ');
-    }
-
     // Adjust window top and bottom
     if (eli->buf->row > eli->textwin.bot) {
         eli->textwin.top += eli->buf->row - eli->textwin.bot;
@@ -85,6 +70,7 @@ static void eli_display(struct Eli *eli)
         eli->textwin.bot -= eli->textwin.top - eli->buf->row;
         eli->textwin.top = eli->buf->row;
     }
+
     // Refresh text window
     size_t winrow;
     struct Line *wline = eli->buf->beg;
@@ -102,14 +88,28 @@ static void eli_display(struct Eli *eli)
         if (wline)
             wline = wline->next;
     }
+
     // Set cursor File
-    int cur_y = eli->buf->row - eli->textwin.top;
     size_t col = eli->buf->col;
     size_t len = line_len(eli->buf->line);
-    int cur_x = (col < len)? col : len;
-    wmove(eli->textwin.win, cur_y, cur_x);
-    eli->textwin.cur_y = cur_y;
-    eli->textwin.cur_x = cur_x;
+    eli->textwin.cur_y = eli->buf->row - eli->textwin.top;
+    eli->textwin.cur_x = (col < len)? col : len;
+    wmove(eli->textwin.win, eli->textwin.cur_y, eli->textwin.cur_x);
+
+    // Refresh title window
+    char title[eli->titlewin.cols];
+    struct Buffer *buf = eli->buf;
+    int ndx = 0;
+    do {
+        ndx += snprintf(&title[ndx], sizeof(title) - ndx, " %s :", buf->name ?: "[No Name]");
+        buf = buf->next ?: eli->beg;
+    } while (buf != eli->buf);
+    snprintf(&title[ndx], sizeof(title) - ndx, " %lu,%lu", eli->textwin.cur_y, eli->textwin.cur_x);
+    wclear(eli->titlewin.win);
+    mvwaddstr(eli->titlewin.win, 0, 0, title);
+    for (size_t col = strlen(title); col < eli->titlewin.cols; col++) {
+        waddch(eli->titlewin.win, ' ');
+    }
 
     wnoutrefresh(eli->titlewin.win);
     wnoutrefresh(eli->textwin.win);
