@@ -63,10 +63,11 @@ bool prevline(struct Eli *e)
 bool nextchar(struct Eli *e)
 {
     size_t col = e->buf->col;
+    struct Line *line = e->buf->line;
     if (buf_movecol(e->buf, col + 1)) {
         return true;
     }
-    else if (e->buf->line->next) {
+    else if (line->next) {
         nextline(e);
         begofline(e);
         return true;
@@ -77,12 +78,13 @@ bool nextchar(struct Eli *e)
 bool prevchar(struct Eli *e)
 {
     size_t col = e->buf->col;
+    struct Line *line = e->buf->line;
     if (col > 0) {
         if (!buf_movecol(e->buf, col - 1))
             return endofline(e);
         return true;
     }
-    else if (e->buf->line->prev) {
+    else if (line->prev) {
         prevline(e);
         endofline(e);
         return true;
@@ -95,8 +97,8 @@ bool nextword(struct Eli *e)
     while (nextchar(e)) {
         size_t col = e->buf->col;
         char *str = e->buf->line->str;
-        char c = str[col];
-        if (!isblank(c) && c != '\0') {
+        char ch = str[col];
+        if (!isblank(ch) && ch != '\0') {
             if (col == 0) {
                 return true;
             }
@@ -115,8 +117,8 @@ bool prevword(struct Eli *e)
     while (prevchar(e)) {
         size_t col = e->buf->col;
         char *str = e->buf->line->str;
-        char c = str[col];
-        if (!isblank(c) && c != '\0') {
+        char ch = str[col];
+        if (!isblank(ch) && ch != '\0') {
             if (col == 0) {
                 return true;
             }
@@ -168,15 +170,16 @@ bool botofwin(struct Eli *e)
 
 bool newline(struct Eli *e)
 {
-    char *split = e->buf->line->str + e->buf->col;
+    struct Line *line e->buf->line;
+    char *split = line->str + e->buf->col;
     size_t len = strlen(split);
-    struct Line *l = line_new(split, len);
+    struct Line *newln = line_new(split, len);
     memset(split, '\0', len);
-    if (e->buf->line->next) {
-        buf_insert(e->buf, e->buf->line->next, l);
+    if (line->next) {
+        buf_insert(e->buf, line->next, newln);
     }
     else {
-        buf_pushback(e->buf, l);
+        buf_pushback(e->buf, newln);
     }
     nextline(e);
     begofline(e);
@@ -185,15 +188,15 @@ bool newline(struct Eli *e)
 
 bool backchar(struct Eli *e)
 {
-    struct Line *l = e->buf->line;
+    struct Line *line = e->buf->line;
     if (!prevchar(e))
         return false;
 
     // If we moved to the previous line, we need to bring what was left of the line below to
     // our current line
-    if (e->buf->line == l->prev) {
-        line_pushback(e->buf->line, l->str, strlen(l->str));
-        buf_erase(e->buf, l);
+    if (e->buf->line == line->prev) {
+        line_pushback(e->buf->line, line->str, line_len(line));
+        buf_erase(e->buf, line);
     }
     else {
         delchar(e);
@@ -250,23 +253,19 @@ bool delbuf(struct Eli *e)
 
 bool nextbuf(struct Eli *e)
 {
-    if (e->buf->next) {
+    if (e->buf->next)
         e->buf = e->buf->next;
-    }
-    else {
+    else
         e->buf = e->beg;
-    }
     return true;
 }
 
 bool prevbuf(struct Eli *e)
 {
-    if (e->buf->prev) {
+    if (e->buf->prev)
         e->buf = e->buf->prev;
-    }
-    else {
+    else
         e->buf = e->end;
-    }
     return true;
 }
 
