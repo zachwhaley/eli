@@ -157,6 +157,18 @@ bool midofwin(struct Eli *e)
 {
     struct Window *win = &e->textwin;
     size_t mid = win->top + ((win->bot - win->top) / 2);
+    // If the window is bigger than the number of lines in the buffer,
+    // then we need to traverse the lines to find the middle line.
+    if (mid >= e->buf->size) {
+        mid = win->top;
+        struct Line *fast = e->buf->beg;
+        struct Line *slow = e->buf->beg;
+        while (fast && fast->next) {
+            fast = fast->next->next;
+            slow = slow->next;
+            mid++;
+        }
+    }
     return buf_moverow(e->buf, mid);
 }
 
