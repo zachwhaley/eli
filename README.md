@@ -41,4 +41,4 @@ $ ./eli somefile
 
 ## Credit
 
-This project was influenced by the [sandy](http://tools.suckless.org/sandy) text editor
+This project was influenced by the [sandy](https://oldgit.suckless.org/sandy) text editor
