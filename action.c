@@ -182,11 +182,13 @@ bool botofwin(struct Eli *e)
 
 bool newline(struct Eli *e)
 {
-    struct Line *line e->buf->line;
+    struct Line *line =  e->buf->line;
     char *split = line->str + e->buf->col;
     size_t len = strlen(split);
+
     struct Line *newln = line_new(split, len);
     memset(split, '\0', len);
+
     if (line->next) {
         buf_insert(e->buf, line->next, newln);
     }
