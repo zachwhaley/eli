@@ -30,6 +30,8 @@ struct Eli {
     int key;
 };
 
-void setmode(struct Eli *e, enum MODE m);
+struct Eli* eli_init(int ac, const char *av[]);
+void eli_run(struct Eli *eli);
+void eli_term(struct Eli *eli);
 
 #endif /* __ELI_EDITOR_H__ */
