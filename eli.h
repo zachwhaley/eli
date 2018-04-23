@@ -20,7 +20,7 @@ struct Action {
 struct Mode {
     int exit_key;
     struct Action *actions;
-    size_t count;
+    size_t size;
 };
 
 struct Eli {

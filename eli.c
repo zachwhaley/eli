@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define COUNT(x) (sizeof (x) / sizeof *(x))
+#define SIZE(x) (sizeof (x) / sizeof *(x))
 #define CTRL(chr) (chr & 037)
 
 // Modal Actions
@@ -41,7 +41,7 @@ static struct Action normal_actions[] = {
 static const struct Mode normal_mode = {
     .exit_key = CTRL('q'),
     .actions = normal_actions,
-    .count = COUNT(normal_actions),
+    .size = SIZE(normal_actions),
 };
 
 static struct Action insert_actions[] = {
@@ -63,7 +63,7 @@ static struct Action insert_actions[] = {
 static const struct Mode insert_mode = {
     .exit_key = CTRL('q'),
     .actions = insert_actions,
-    .count = COUNT(insert_actions),
+    .size = SIZE(insert_actions),
 };
 
 static void setmode(struct Eli *e, enum MODE m);
@@ -129,7 +129,7 @@ void eli_run(struct Eli *eli)
 
         // Find an action for the key
         struct Action action = {};
-        for (int ndx = 0; ndx < eli->mode.count; ndx++) {
+        for (int ndx = 0; ndx < eli->mode.size; ndx++) {
             action = eli->mode.actions[ndx];
             if (action.key == eli->key) {
                 if (action.func)
