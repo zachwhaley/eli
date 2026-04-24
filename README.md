@@ -8,14 +8,12 @@ eli is a simply made text editor written in C
 
 [GNU ncurses](https://www.gnu.org/software/ncurses/ncurses.html)
 
-```bash
-$ sudo dnf install ncurses ncurses-libs ncurses-static
-```
-
 [GNU GCC](http://gcc.gnu.org/)
 
-```bash
-$ sudo dnf install gcc
+## How to build it
+
+```sh
+$ make
 ```
 
 ## What it Does
@@ -35,7 +33,6 @@ See `eli.c` for more
 ## How to Use it
 
 ```bash
-$ make
 $ ./eli somefile
 ```
 
