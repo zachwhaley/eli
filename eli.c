@@ -219,7 +219,7 @@ static void drawscreen(struct Eli *eli)
         ndx += snprintf(&title[ndx], sizeof(title) - ndx, " %s :", buf->name ?: "[No Name]");
         buf = buf->next ?: eli->beg;
     } while (buf != eli->buf);
-    snprintf(&title[ndx], sizeof(title) - ndx, " %lu,%lu", eli->textwin.cur_y, eli->textwin.cur_x);
+    snprintf(&title[ndx], sizeof(title) - ndx, " %lu,%lu", eli->buf->row, eli->textwin.cur_x);
     wclear(eli->titlewin.win);
     mvwaddstr(eli->titlewin.win, 0, 0, title);
     for (size_t col = strlen(title); col < eli->titlewin.cols; col++) {

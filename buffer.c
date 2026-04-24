@@ -20,7 +20,7 @@ void buf_free(struct Buffer *buf)
     buf_clear(buf);
     buf->next = buf->prev = NULL;
     free(buf->name);
-    buf->name = '\0';
+    buf->name = NULL;
     free(buf);
 }
 
@@ -126,11 +126,16 @@ void buf_insert(struct Buffer *buf, struct Line *dst, struct Line *line)
         line->next->prev = line;
     if (line->prev)
         line->prev->next = line;
+    else
+        buf->beg = line;
     buf->size++;
 }
 
 void buf_erase(struct Buffer *buf, struct Line *line)
 {
+    if (buf->line == line)
+        buf->line = line->next ?: line->prev;
+
     if (line == buf->beg)
         buf->beg = line->next;
     else

@@ -57,6 +57,8 @@ bool nextline(struct Eli *e)
 
 bool prevline(struct Eli *e)
 {
+    if (e->buf->row == 0)
+        return false;
     return buf_moverow(e->buf, e->buf->row - 1);
 }
 
@@ -291,7 +293,7 @@ static void getinput(struct Eli *e, char *input, const char *cmd)
 
     // Get user input
     echo();
-    wgetstr(e->cmdwin.win, input);
+    wgetnstr(e->cmdwin.win, input, BUFSIZ - 1);
     noecho();
 
     // Clear command prompt
